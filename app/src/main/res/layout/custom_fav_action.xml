@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="assasingh.nearmev2.View.MainActivity">
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fav_action_textView"
+        android:textSize="15sp"
+        android:text="hello"
+        android:layout_weight="0.9"
+        android:textStyle="bold"
+        android:padding="15dp"
+        />
+
+    <ImageView
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_gravity="right"
+        android:paddingTop="10dp"
+        android:layout_weight="0.1"
+        android:id="@+id/fav_action_imageView"
+        android:src="@drawable/play_black"
+        />
+
+</LinearLayout>
