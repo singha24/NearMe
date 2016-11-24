@@ -6,10 +6,10 @@ import android.widget.ImageView;
  * Created by Assa Chana on 23/11/2016.
  */
 
-public class FavouritePlaceObject {
+public class DayPlanObject {
 
     private String title;
-    private String date;
+    private String description;
     private ImageView image;
     private String time;
     public String getTitle() {
@@ -24,12 +24,12 @@ public class FavouritePlaceObject {
         return image;
     }
 
-    public String getDate(){
-        return date;
+    public String getDescription(){
+        return description;
     }
 
-    public void setDate(String date){
-        this.date = date;
+    public void setDescription(String description){
+        this.description = description;
     }
 
     public String getTime() {

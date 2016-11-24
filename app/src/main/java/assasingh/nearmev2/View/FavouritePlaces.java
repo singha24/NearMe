@@ -1,6 +1,6 @@
 package assasingh.nearmev2.View;
 
-import android.app.FragmentManager;import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -51,19 +51,19 @@ public class FavouritePlaces extends AppCompatActivity {
         FavouritePlaceObject favObj = new FavouritePlaceObject();
 
         favObj.setTitle("Boston Tea Party");
-        favObj.setDate("May 26, 2016, 13:35");
+        favObj.setTime("May 26, 2016, 13:35");
         results.add(favObj);
 
         FavouritePlaceObject favObj1 = new FavouritePlaceObject();
 
         favObj1.setTitle("Mr Singhs Pizza");
-        favObj1.setDate("May 15, 2016, 10:35");
+        favObj1.setTime("May 15, 2016, 10:35");
         results.add(favObj1);
 
         FavouritePlaceObject favObj2 = new FavouritePlaceObject();
 
         favObj2.setTitle("Rock Climbing");
-        favObj2.setDate("May 20, 2016, 10:10");
+        favObj2.setTime("May 20, 2016, 10:10");
         results.add(favObj2);
 
         // Add some more dummy data for testing

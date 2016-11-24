@@ -22,7 +22,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".View.FavouritePlaces"></activity>
+        <activity android:name=".View.FavouritePlaces" />
+        <activity
+            android:name=".View.DayPlan"
+            android:label="@string/title_activity_day_plan"
+            android:parentActivityName=".View.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="assasingh.nearmev2.View.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

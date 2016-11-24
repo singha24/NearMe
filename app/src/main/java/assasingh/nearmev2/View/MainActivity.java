@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity
                 switch( position )
                 {
                     case 0:
-                        //TODO
+                        dayPlanIntent();
                         break;
                     case 1:
                         //TODO
@@ -121,6 +121,11 @@ public class MainActivity extends AppCompatActivity
 
     public void favPlacesIntent(){
         Intent intent = new Intent(this, FavouritePlaces.class);
+        startActivity(intent);
+    }
+
+    public void dayPlanIntent(){
+        Intent intent = new Intent(this, DayPlan.class);
         startActivity(intent);
     }
 

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NearMeV2</string>
+    <string name="app_name">NearMe</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -11,6 +11,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="speech_prompt">Say something&#8230;</string>
     <string name="speech_not_supported">Sorry! Your device doesn\'t support speech input</string>
+    <string name="title_activity_day_plan">Your day plan...</string>
 
 
 </resources>

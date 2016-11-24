@@ -36,7 +36,7 @@ public class FavouriteAlertFragment extends DialogFragment {
 
         lv = (ListView) rootView.findViewById(R.id.dialogListView);
 
-        getDialog().setTitle("what would you like to do?");
+        getDialog().setTitle("What would you like to do?");
 
         FavActionDialogAdapter adapter = new FavActionDialogAdapter(getActivity(), menu, actionIcons);
 

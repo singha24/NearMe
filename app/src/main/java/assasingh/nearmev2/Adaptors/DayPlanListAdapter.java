@@ -9,14 +9,15 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import assasingh.nearmev2.Object.DayPlanObject;
 import assasingh.nearmev2.Object.FavouritePlaceObject;
 import assasingh.nearmev2.R;
 
-public class FavouriteListAdapter extends BaseAdapter {
-    private ArrayList<FavouritePlaceObject> listData;
+public class DayPlanListAdapter extends BaseAdapter {
+    private ArrayList<DayPlanObject> listData;
     private LayoutInflater layoutInflater;
 
-    public FavouriteListAdapter(Context aContext, ArrayList<FavouritePlaceObject> listData) {
+    public DayPlanListAdapter(Context aContext, ArrayList<DayPlanObject> listData) {
         this.listData = listData;
         layoutInflater = LayoutInflater.from(aContext);
     }
@@ -39,24 +40,25 @@ public class FavouriteListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
         if (convertView == null) {
-            convertView = layoutInflater.inflate(R.layout.favourite_places_row, null);
+            convertView = layoutInflater.inflate(R.layout.day_plan_row, null);
             holder = new ViewHolder();
-            holder.title = (TextView) convertView.findViewById(R.id.title);
-            //holder.image = (ImageView) convertView.findViewById(R.id.favImage);
-            holder.date = (TextView) convertView.findViewById(R.id.date);
+            holder.title = (TextView) convertView.findViewById(R.id.dayPlanTitle);
+            holder.time = (TextView) convertView.findViewById(R.id.dayPlanTime);
+            holder.description = (TextView) convertView.findViewById(R.id.dayPlanText);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
         holder.title.setText(listData.get(position).getTitle());
-        holder.date.setText(listData.get(position).getTime());
+        holder.description.setText(listData.get(position).getDescription());
+        holder.time.setText(listData.get(position).getTime());
         return convertView;
     }
 
     static class ViewHolder {
+        TextView time;
         TextView title;
-        TextView image;
-        TextView date;
+        TextView description;
     }
 }
