@@ -12,6 +12,7 @@
     <string name="speech_prompt">Say something&#8230;</string>
     <string name="speech_not_supported">Sorry! Your device doesn\'t support speech input</string>
     <string name="title_activity_day_plan">Your day plan...</string>
+    <string name="title_activity_fav_places">Your Favourites</string>
 
 
 </resources>
