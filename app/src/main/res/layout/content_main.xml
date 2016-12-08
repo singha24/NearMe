@@ -11,11 +11,11 @@
     tools:context="assasingh.nearmev2.View.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <ImageView
+    <android.support.v4.view.ViewPager
         android:layout_width="match_parent"
         android:layout_height="207dp"
         android:background="@drawable/border"
-        android:src="@drawable/ic_menu_camera"
+        android:id="@+id/trending"
 
 
         />

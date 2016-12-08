@@ -17,6 +17,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.view.ViewPager;
 import android.text.InputType;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -43,6 +44,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import assasingh.nearmev2.Adaptors.TrendingAdapter;
 import assasingh.nearmev2.Fragments.FirstFragment;
 import assasingh.nearmev2.Fragments.SecondFragment;
 import assasingh.nearmev2.Fragments.ThirdFragment;
@@ -68,6 +70,8 @@ public class MainActivity extends AppCompatActivity
 
     private GestureDetectorCompat gestureDetectorCompat;
 
+    private ViewPager viewPager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +80,10 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        viewPager = (ViewPager) findViewById(R.id.trending);
 
+        TrendingAdapter trendingAdapter = new TrendingAdapter (getSupportFragmentManager());
+        viewPager.setAdapter(trendingAdapter);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
