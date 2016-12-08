@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -22,10 +24,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".View.FavouritePlaces"
+        <activity
+            android:name=".View.FavouritePlaces"
             android:label="@string/title_activity_fav_places"
-            android:parentActivityName=".View.MainActivity"
-            />
+            android:parentActivityName=".View.MainActivity" />
         <activity
             android:name=".View.DayPlan"
             android:label="@string/title_activity_day_plan"
@@ -35,6 +37,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="assasingh.nearmev2.View.MainActivity" />
         </activity>
+        <activity
+            android:name=".View.SettingsActivity"
+            android:label="@string/title_activity_settings" />
+        <activity android:name=".View.NearMe" />
+        <activity android:name=".View.Postcard"
+            android:label="@string/title_activity_postcard"
+            android:screenOrientation="landscape"></activity>
     </application>
 
 </manifest>

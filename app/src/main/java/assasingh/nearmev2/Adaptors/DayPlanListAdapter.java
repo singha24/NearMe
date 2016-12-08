@@ -9,15 +9,14 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import assasingh.nearmev2.Object.DayPlanObject;
-import assasingh.nearmev2.Object.FavouritePlaceObject;
+import assasingh.nearmev2.Model.DayPlan;
 import assasingh.nearmev2.R;
 
 public class DayPlanListAdapter extends BaseAdapter {
-    private ArrayList<DayPlanObject> listData;
+    private ArrayList<DayPlan> listData;
     private LayoutInflater layoutInflater;
 
-    public DayPlanListAdapter(Context aContext, ArrayList<DayPlanObject> listData) {
+    public DayPlanListAdapter(Context aContext, ArrayList<DayPlan> listData) {
         this.listData = listData;
         layoutInflater = LayoutInflater.from(aContext);
     }

@@ -1,6 +1,5 @@
 package assasingh.nearmev2.View;
 
-import android.app.ActionBar;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -11,14 +10,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import assasingh.nearmev2.Adaptors.DayPlanListAdapter;
 import assasingh.nearmev2.Fragments.FavouriteAlertFragment;
-import assasingh.nearmev2.Object.DayPlanObject;
-import assasingh.nearmev2.Object.FavouritePlaceObject;
 import assasingh.nearmev2.R;
 
 public class DayPlan extends AppCompatActivity {
@@ -63,29 +59,29 @@ public class DayPlan extends AppCompatActivity {
     }
 
     private ArrayList getListData() {
-        ArrayList<DayPlanObject> results = new ArrayList<DayPlanObject>();
-        DayPlanObject favObj = new DayPlanObject();
+        ArrayList<assasingh.nearmev2.Model.DayPlan> results = new ArrayList<assasingh.nearmev2.Model.DayPlan>();
+        assasingh.nearmev2.Model.DayPlan favObj = new assasingh.nearmev2.Model.DayPlan();
 
         favObj.setTitle("Start location");
         favObj.setDescription("Restaurant, great food, great atmosphere and great company");
         favObj.setTime("15:38");
         results.add(favObj);
 
-        DayPlanObject favObj1 = new DayPlanObject();
+        assasingh.nearmev2.Model.DayPlan favObj1 = new assasingh.nearmev2.Model.DayPlan();
 
         favObj1.setTitle("Boston Tea Party");
         favObj1.setDescription("Best blend of tea's and coffee's");
         favObj1.setTime("16:15");
         results.add(favObj1);
 
-        DayPlanObject favObj2 = new DayPlanObject();
+        assasingh.nearmev2.Model.DayPlan favObj2 = new assasingh.nearmev2.Model.DayPlan();
 
         favObj2.setTitle("Aston Woodcock Sports");
         favObj2.setDescription("Aston woodcock sports center offers");
         favObj2.setTime("16:57");
         results.add(favObj2);
 
-        DayPlanObject obj3 = new DayPlanObject();
+        assasingh.nearmev2.Model.DayPlan obj3 = new assasingh.nearmev2.Model.DayPlan();
 
         obj3.setTitle("Home");
         obj3.setTime("18:02");

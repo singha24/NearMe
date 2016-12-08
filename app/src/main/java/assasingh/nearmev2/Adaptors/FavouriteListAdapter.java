@@ -9,14 +9,14 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import assasingh.nearmev2.Object.FavouritePlaceObject;
+import assasingh.nearmev2.Model.FavouritePlace;
 import assasingh.nearmev2.R;
 
 public class FavouriteListAdapter extends BaseAdapter {
-    private ArrayList<FavouritePlaceObject> listData;
+    private ArrayList<FavouritePlace> listData;
     private LayoutInflater layoutInflater;
 
-    public FavouriteListAdapter(Context aContext, ArrayList<FavouritePlaceObject> listData) {
+    public FavouriteListAdapter(Context aContext, ArrayList<FavouritePlace> listData) {
         this.listData = listData;
         layoutInflater = LayoutInflater.from(aContext);
     }

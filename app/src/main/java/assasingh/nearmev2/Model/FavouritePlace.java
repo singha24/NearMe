@@ -1,4 +1,4 @@
-package assasingh.nearmev2.Object;
+package assasingh.nearmev2.Model;
 
 import android.widget.ImageView;
 
@@ -6,10 +6,10 @@ import android.widget.ImageView;
  * Created by Assa Chana on 23/11/2016.
  */
 
-public class DayPlanObject {
+public class FavouritePlace {
 
     private String title;
-    private String description;
+    private String date;
     private ImageView image;
     private String time;
     public String getTitle() {
@@ -24,12 +24,12 @@ public class DayPlanObject {
         return image;
     }
 
-    public String getDescription(){
-        return description;
+    public String getDate(){
+        return date;
     }
 
-    public void setDescription(String description){
-        this.description = description;
+    public void setDate(String date){
+        this.date = date;
     }
 
     public String getTime() {

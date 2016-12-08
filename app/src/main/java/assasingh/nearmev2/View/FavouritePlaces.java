@@ -1,5 +1,6 @@
 package assasingh.nearmev2.View;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -11,11 +12,10 @@ import java.util.ArrayList;
 
 import assasingh.nearmev2.Adaptors.FavouriteListAdapter;
 import assasingh.nearmev2.Fragments.FavouriteAlertFragment;
-import assasingh.nearmev2.Object.FavouritePlaceObject;
+import assasingh.nearmev2.Model.FavouritePlace;
 import assasingh.nearmev2.R;
 
 public class FavouritePlaces extends AppCompatActivity {
-
 
 
 
@@ -23,6 +23,8 @@ public class FavouritePlaces extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.fav_content);
+
+        final ListView favListview = (ListView) findViewById(R.id.favListView);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -33,34 +35,41 @@ public class FavouritePlaces extends AppCompatActivity {
         lv1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String picked = "you selected " + String.valueOf(parent.getItemAtPosition(position));
+
+                String picked = String.valueOf(parent.getItemAtPosition(position));
 
                 final android.app.FragmentManager fm = getFragmentManager();
                 final  FavouriteAlertFragment favFrag = new FavouriteAlertFragment();
 
+                Bundle bundle = new Bundle();
+                bundle.putString("selected", picked);
+
+                favFrag.setArguments(bundle);
+
                 favFrag.show(fm,"Alert");
 
-                Toast.makeText(FavouritePlaces.this, picked, Toast.LENGTH_SHORT).show();
+                Toast.makeText(FavouritePlaces.this, picked,Toast.LENGTH_SHORT).show();
+
             }
         });
 
     }
 
     private ArrayList getListData() {
-        ArrayList<FavouritePlaceObject> results = new ArrayList<FavouritePlaceObject>();
-        FavouritePlaceObject favObj = new FavouritePlaceObject();
+        ArrayList<FavouritePlace> results = new ArrayList<FavouritePlace>();
+        FavouritePlace favObj = new FavouritePlace();
 
         favObj.setTitle("Boston Tea Party");
         favObj.setTime("May 26, 2016, 13:35");
         results.add(favObj);
 
-        FavouritePlaceObject favObj1 = new FavouritePlaceObject();
+        FavouritePlace favObj1 = new FavouritePlace();
 
         favObj1.setTitle("Mr Singhs Pizza");
         favObj1.setTime("May 15, 2016, 10:35");
         results.add(favObj1);
 
-        FavouritePlaceObject favObj2 = new FavouritePlaceObject();
+        FavouritePlace favObj2 = new FavouritePlace();
 
         favObj2.setTitle("Rock Climbing");
         favObj2.setTime("May 20, 2016, 10:10");

@@ -1,6 +1,7 @@
 package assasingh.nearmev2.View;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,10 +10,16 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.view.GestureDetectorCompat;
 import android.text.InputType;
+import android.view.GestureDetector;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -25,6 +32,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -37,10 +47,15 @@ import assasingh.nearmev2.Fragments.FirstFragment;
 import assasingh.nearmev2.Fragments.SecondFragment;
 import assasingh.nearmev2.Fragments.ThirdFragment;
 import assasingh.nearmev2.Adaptors.ListViewAdapter;
+import assasingh.nearmev2.Model.DatabaseOperations;
 import assasingh.nearmev2.R;
 
+import android.view.MotionEvent;
+import android.gesture.Gesture;
+import static android.view.GestureDetector.*;
+
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnGestureListener, OnDoubleTapListener {
 
     private static String [] menu = {"Your Day Plan", "Near Me", "Favourite Places", "More"};
     private static Integer[] menuImages = {R.drawable.list, R.drawable.location, R.drawable.heart, R.drawable.more};
@@ -48,6 +63,10 @@ public class MainActivity extends AppCompatActivity
     private String speechInput = "";
 
     private final int REQ_CODE_SPEECH_INPUT = 100;
+
+    private EditText userTextInput;
+
+    private GestureDetectorCompat gestureDetectorCompat;
 
 
     @Override
@@ -57,12 +76,15 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
         fab.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 fabLongPress();
+                //autoCompleteTextView();
                 return false;
             }
         });
@@ -87,6 +109,8 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        gestureDetectorCompat = new GestureDetectorCompat(MainActivity.this, MainActivity.this);
+        gestureDetectorCompat.setOnDoubleTapListener(MainActivity.this);
 
 
         ListAdapter theAdapter = new ListViewAdapter(this, menu, menuImages);
@@ -104,7 +128,7 @@ public class MainActivity extends AppCompatActivity
                         dayPlanIntent();
                         break;
                     case 1:
-                        //TODO
+                        nearMeIntent();
                         break;
                     case 2:
                         favPlacesIntent();
@@ -124,6 +148,16 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
+    public void nearMeIntent(){
+        Intent intent = new Intent(this, NearMe.class);
+        startActivity(intent);
+    }
+
+    public void settingsIntent(){
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
+    }
+
     public void dayPlanIntent(){
         Intent intent = new Intent(this, DayPlan.class);
         startActivity(intent);
@@ -131,23 +165,28 @@ public class MainActivity extends AppCompatActivity
 
     public void fabLongPress(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("o'ello");
+        builder.setTitle("It's a bit noisy isn't it?");
+        builder.setIcon(ResourcesCompat.getDrawable(getResources(), android.R.drawable.toast_frame, null));
 
 // Set up the input
-        final EditText input = new EditText(this);
-        input.requestFocus();
+        userTextInput = new EditText(this);
+        userTextInput.requestFocus();
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+        imm.showSoftInput(userTextInput, InputMethodManager.SHOW_IMPLICIT);
 // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        builder.setView(input);
+        userTextInput.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(userTextInput);
 
 // Set up the buttons
         builder.setPositiveButton("Search", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                speechInput = input.getText().toString();
-                Toast.makeText(getApplicationContext(), getTextFromSpeech(), Toast.LENGTH_SHORT);
+                speechInput = userTextInput.getText().toString();
+
+                DatabaseOperations dbo = new DatabaseOperations(getApplicationContext());
+                dbo.insertQuery(dbo,getTextFromSpeech());
+
+                Toast.makeText(getApplicationContext(), getTextFromSpeech(), Toast.LENGTH_SHORT).show();
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -158,6 +197,24 @@ public class MainActivity extends AppCompatActivity
         });
 
         builder.show();
+    }
+
+    public void autoCompleteTextView(){
+        final Dialog dialog = new Dialog(this);
+        LayoutInflater inflater = (LayoutInflater)this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View post = inflater.inflate(R.layout.autocompleteview, null);
+        AutoCompleteTextView  textView = (AutoCompleteTextView)post.findViewById((R.id.history));
+
+        String[] suggestions = {"Test", "Adventure", "Fun"};
+        ArrayAdapter adapter = new ArrayAdapter(this,
+                android.R.layout.simple_dropdown_item_1line, suggestions);
+        textView.setAdapter(adapter);
+////Autocomplete
+
+//textView.setThreshold(2);
+        dialog.setContentView(post);
+        dialog.setTitle("Post");
+        dialog.show();
     }
 
     //Speech Input
@@ -232,7 +289,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            return true;
+            settingsIntent();
         }
 
         return super.onOptionsItemSelected(item);
@@ -338,4 +395,61 @@ public class MainActivity extends AppCompatActivity
         System.exit(0);
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        gestureDetectorCompat.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
+    @Override
+    public boolean onDown(MotionEvent e) {
+        autoCompleteTextView();
+        return false;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent e) {
+
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent e) {
+        autoCompleteTextView();
+        return false;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+        autoCompleteTextView();
+        return false;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e) {
+
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+        autoCompleteTextView();
+        return false;
+    }
+
+    @Override
+    public boolean onSingleTapConfirmed(MotionEvent e) {
+        autoCompleteTextView();
+        return false;
+    }
+
+    @Override
+    public boolean onDoubleTap(MotionEvent e) {
+        autoCompleteTextView();
+        return false;
+    }
+
+    @Override
+    public boolean onDoubleTapEvent(MotionEvent e) {
+        autoCompleteTextView();
+        return false;
+    }
 }
