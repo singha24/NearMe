@@ -40,7 +40,6 @@ public class TrendingFragment extends Fragment {
 
         count.setText(message);
 
-
         return view;
     }
 
