@@ -5,6 +5,7 @@ import android.app.DialogFragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ public class FavouriteAlertFragment extends DialogFragment {
     private static ListView lv;
     private static Integer[] actionIcons = {R.drawable.postcard, R.drawable.share, R.drawable.cross};
     private static String[] menu = {"Create Postcard", "Share this place", "Remove from favourites"};
+    private static String picked;
 
 
     public FavouriteAlertFragment() {
@@ -38,7 +40,11 @@ public class FavouriteAlertFragment extends DialogFragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.dialog_list_view, container, false);
 
-        final String picked = getArguments().getString("selected");
+        try {
+            picked = getArguments().getString("selected");
+        }catch (NullPointerException e){
+            Log.e("NullPointer", e.toString());
+        }
 
         lv = (ListView) rootView.findViewById(R.id.dialogListView);
 
@@ -60,7 +66,11 @@ public class FavouriteAlertFragment extends DialogFragment {
                         createPostCardIntent();
                         break;
                     case 1:
-                        share(picked,"birmingham"); //will need to pass name of place and location from FavouritePlaces activity
+                        if(!(picked == null)) {
+                            share(picked, "birmingham"); //will need to pass name of place and location from FavouritePlaces activity
+                        }else{
+                            Toast.makeText(getActivity(), "Well this is embarrassing.\nUnable to get name of selected place", Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     case 2:
                         Toast.makeText(getActivity(), t, Toast.LENGTH_SHORT).show();

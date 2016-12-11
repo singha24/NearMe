@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.speech.RecognizerIntent;
@@ -31,6 +32,7 @@ import android.support.v7.widget.Toolbar;
 import android.support.v4.app.FragmentManager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -90,6 +92,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                vibrate();
                 fabLongPress();
                 //autoCompleteTextView();
                 return false;
@@ -150,6 +153,12 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    public void vibrate(){
+        Vibrator v = (Vibrator) this.getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
+        // Vibrate for 500 milliseconds
+        v.vibrate(50);
+    }
+
     public void favPlacesIntent(){
         Intent intent = new Intent(this, FavouritePlaces.class);
         startActivity(intent);
@@ -171,15 +180,29 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void fabLongPress(){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("It's a bit noisy isn't it?");
         builder.setIcon(ResourcesCompat.getDrawable(getResources(), android.R.drawable.toast_frame, null));
 
+
 // Set up the input
         userTextInput = new EditText(this);
+
+        /*userTextInput.post(new Runnable()
+        {
+            public void run()
+            {
+                userTextInput.requestFocus();
+            }
+        });
+        */
+
+        userTextInput.setFocusableInTouchMode(true);
         userTextInput.requestFocus();
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(userTextInput, InputMethodManager.SHOW_IMPLICIT);
+
+
+        //InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        //imm.showSoftInput(userTextInput, InputMethodManager.SHOW_FORCED);
 // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
         userTextInput.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(userTextInput);
@@ -202,7 +225,6 @@ public class MainActivity extends AppCompatActivity
                 dialog.cancel();
             }
         });
-
         builder.show();
     }
 

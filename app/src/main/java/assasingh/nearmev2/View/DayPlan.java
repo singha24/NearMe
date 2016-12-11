@@ -52,6 +52,11 @@ public class DayPlan extends AppCompatActivity {
                 final android.app.FragmentManager fm = getFragmentManager();
                 final FavouriteAlertFragment favFrag = new FavouriteAlertFragment();
 
+                Bundle bundle = new Bundle();
+                bundle.putString("selected", picked);
+
+                favFrag.setArguments(bundle);
+
                 favFrag.show(fm,"Alert");
             }
         });
