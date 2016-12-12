@@ -49,7 +49,11 @@ public class NearMe extends AppCompatActivity {
         String placesRequest = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
                 latitude + "," + longitude + "&radius=" + radius + "&key=" + placesKey;
         PlacesReadFeed process = new PlacesReadFeed();
-        process.execute(new String[]{placesRequest});
+        try {
+            process.execute(new String[]{placesRequest});
+        }catch(Exception e){
+            Log.e("NearMe Async Task execute Error", e.toString());
+        }
     }
 
     protected void reportBack(GooglePlaceList nearby) {
@@ -86,21 +90,31 @@ public class NearMe extends AppCompatActivity {
                 return places;
             } catch (Exception e) {
                 e.printStackTrace();
-                Log.i("PLACES_EXAMPLE", e.getMessage());
+                Log.i("PLACES_EXAMPLE", "PLACES RESULT ERROR");
                 return null;
             }
         }
 
         @Override
         protected void onPreExecute() {
+            try {
             this.dialog.setMessage("Getting nearby places...");
-            this.dialog.show();
+
+                this.dialog.show();
+            }catch(Exception e){
+                Log.e("Dialog error", "unable to display dialog box on getting places");
+            }
         }
 
         @Override
         protected void onPostExecute(GooglePlaceList places) {
+            try{
             this.dialog.dismiss();
             reportBack(places);
+        }catch (Exception e){
+                Toast.makeText(NearMe.this, "Well, err. This is embarrassing.", Toast.LENGTH_SHORT).show();
+                Log.e("REPORT BACK ERROR", "OnPostExecute");
+            }
         }
 
 
