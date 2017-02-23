@@ -21,7 +21,7 @@ import java.util.Date;
 
 import assasingh.nearmev2.R;
 
-public class Postcard extends AppCompatActivity {
+public class PostCard extends AppCompatActivity {
 
 
     private Button share;
@@ -93,7 +93,7 @@ public class Postcard extends AppCompatActivity {
         try {
             startActivity(Intent.createChooser(intent, "Share Screenshot"));
         } catch (ActivityNotFoundException e) {
-            Toast.makeText(Postcard.this, "No App Available", Toast.LENGTH_SHORT).show();
+            Toast.makeText(PostCard.this, "No App Available", Toast.LENGTH_SHORT).show();
         }
     }
 }

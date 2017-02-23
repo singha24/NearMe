@@ -17,7 +17,7 @@ import android.widget.Toast;
 import assasingh.nearmev2.Adaptors.FavActionDialogAdapter;
 import assasingh.nearmev2.R;
 import assasingh.nearmev2.View.FavouritePlaces;
-import assasingh.nearmev2.View.Postcard;
+import assasingh.nearmev2.View.PostCard;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -85,7 +85,7 @@ public class FavouriteAlertFragment extends DialogFragment {
     }
 
     public void createPostCardIntent(){
-        Intent intent = new Intent(getActivity(), Postcard.class);
+        Intent intent = new Intent(getActivity(), PostCard.class);
         startActivity(intent);
     }
 

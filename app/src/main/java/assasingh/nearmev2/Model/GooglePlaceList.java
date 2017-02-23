@@ -31,6 +31,10 @@ public class GooglePlaceList {
         return results;
     }
 
+    public int getSize(){
+        return results.size();
+    }
+
     public void setResults(List<GooglePlace> results) {
         this.results = results;
     }
@@ -40,6 +44,30 @@ public class GooglePlaceList {
         List<String> result = new ArrayList<String>();
         for (GooglePlace place : results) {
             result.add(place.toString());
+        }
+        return result;
+    }
+
+    public List<String> getPlaceLatLng(){
+        List<String> result = new ArrayList<String>();
+        for (GooglePlace place : results){
+            result.add(place.getLatLng());
+        }
+        return result;
+    }
+
+    public List<Double> getLongitudes(){
+        List<Double> result = new ArrayList<Double>();
+        for(GooglePlace g : results){
+            result.add(g.getLongitude());
+        }
+        return result;
+    }
+
+    public List<Double> getLatitudes(){
+        List<Double> result = new ArrayList<Double>();
+        for(GooglePlace g : results){
+            result.add(g.getLongitude());
         }
         return result;
     }

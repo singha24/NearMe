@@ -7,14 +7,18 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <permission
+        android:name="android.permission.MAPS_RECEIVE"
+        android:protectionLevel="signature" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/MyTheme">
         <activity
             android:name=".View.MainActivity"
             android:label="@string/app_name"
@@ -38,13 +42,33 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="assasingh.nearmev2.View.MainActivity" />
         </activity>
+        <activity android:name=".View.NearMe">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="assasingh.nearmev2.View.MainActivity" />
+        </activity>
         <activity
-            android:name=".View.SettingsActivity"
-            android:label="@string/title_activity_settings" />
-        <activity android:name=".View.NearMe" />
-        <activity android:name=".View.Postcard"
+            android:name=".View.PostCard"
             android:label="@string/title_activity_postcard"
-            android:screenOrientation="landscape"></activity>
+            android:screenOrientation="landscape" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/places_key" />
+
+        <service
+            android:name=".Services.LocationService"
+            android:enabled="true"
+            android:exported="true"></service>
+
+        <activity android:name=".View.SettingsActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="@string/title_activity_settings">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="assasingh.nearmev2.View.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

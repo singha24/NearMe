@@ -21,6 +21,18 @@ public class GooglePlace implements Serializable {
     //@Key
     private String formatted_phone_number;
 
+    private double latitude;
+    private double longitude;
+
+
+    public void setLatitude(double lat){
+        this.latitude = lat;
+    }
+
+    public void setLongitude(double lng){
+        this.longitude = lng;
+    }
+
     //@Key
     private List<String> types;
 
@@ -194,6 +206,23 @@ public class GooglePlace implements Serializable {
                 this.getGeometry().getLocation().getLat() + ", " +
                 this.getGeometry().getLocation().getLng();
     }
+
+    public String getLatLng(){
+
+
+        return this.getGeometry().getLocation().getLat() + "\n" + this.getGeometry().getLocation().getLng();
+    }
+
+
+    public Double getLatitude(){
+        return this.latitude;
+    }
+
+    public Double getLongitude(){
+        return this.longitude;
+    }
+
+
 
     /**
      * @param geometry the geometry to set

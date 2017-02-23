@@ -3,6 +3,7 @@ package assasingh.nearmev2.View;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -26,6 +27,8 @@ public class FavouritePlaces extends AppCompatActivity {
 
         final ListView favListview = (ListView) findViewById(R.id.favListView);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.favToolbar);
+        setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         ArrayList image_details = getListData();

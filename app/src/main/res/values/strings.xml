@@ -14,7 +14,7 @@
     <string name="title_activity_day_plan">Your day plan...</string>
     <string name="title_activity_fav_places">Your Favourites</string>
     <string name="title_activity_postcard">Postcards are fun!</string>
-    <string name="title_activity_settings">Settings</string>
+    <string name="title_activity_settings">Preferences</string>
     <string name="places_key">AIzaSyB3Qirj2H1pL_63c7yXcMIMCjcQUinyHS4</string>
 
     <!-- Strings related to Settings -->

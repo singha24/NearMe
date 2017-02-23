@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Vibrator;
@@ -54,6 +55,7 @@ import assasingh.nearmev2.Fragments.ThirdFragment;
 import assasingh.nearmev2.Adaptors.ListViewAdapter;
 import assasingh.nearmev2.Model.DatabaseOperations;
 import assasingh.nearmev2.R;
+import assasingh.nearmev2.Services.LocationService;
 
 import android.view.MotionEvent;
 import android.gesture.Gesture;
@@ -74,6 +76,7 @@ public class MainActivity extends AppCompatActivity
     private GestureDetectorCompat gestureDetectorCompat;
 
     private ViewPager viewPager;
+    private LocationService locationService;
 
 
     @Override
@@ -172,8 +175,12 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void nearMeIntent(){
-        Intent intent = new Intent(this, NearMe.class);
-        startActivity(intent);
+        if(LocationService.locationAvailable()) {
+            Intent intent = new Intent(this, NearMe.class);
+            intent.putExtra("lat", LocationService.getLatitude());
+            intent.putExtra("lon", LocationService.getLongitude());
+            startActivity(intent);
+        }
     }
 
     public void settingsIntent(){
@@ -369,8 +376,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart() {
         super.onStart();
+        startService(new Intent(this, LocationService.class));
         enableGPS();
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+    }
+
 
     public void enableGPS() {
         LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
@@ -405,6 +420,7 @@ public class MainActivity extends AppCompatActivity
 
         }
     }
+
 
     public void createAlert(String title, String message) {
         new AlertDialog.Builder(this)
@@ -487,5 +503,11 @@ public class MainActivity extends AppCompatActivity
     public boolean onDoubleTapEvent(MotionEvent e) {
         autoCompleteTextView();
         return false;
+    }
+
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        stopService(new Intent(this, LocationService.class));
     }
 }
