@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import assasingh.nearmev2.R;
 import assasingh.nearmev2.View.TrendingFragment;
 
 /**
@@ -13,6 +14,7 @@ import assasingh.nearmev2.View.TrendingFragment;
 
 public class TrendingAdapter extends FragmentStatePagerAdapter {
 
+
     public TrendingAdapter(FragmentManager fm){
         super(fm);
     }
@@ -20,6 +22,7 @@ public class TrendingAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         Fragment fragment = new TrendingFragment();
+
         Bundle bundle = new Bundle();
 
         bundle.putInt("count", position+1);

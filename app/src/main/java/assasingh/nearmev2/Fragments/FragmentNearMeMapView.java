@@ -2,19 +2,14 @@ package assasingh.nearmev2.Fragments;
 
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.util.StringBuilderPrinter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,26 +18,14 @@ import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.gson.Gson;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
-import assasingh.nearmev2.Model.GooglePlace;
 import assasingh.nearmev2.Model.GooglePlaceList;
 import assasingh.nearmev2.Model.GooglePlacesUtility;
 import assasingh.nearmev2.Model.SimpleGooglePlace;
@@ -59,6 +42,7 @@ public class FragmentNearMeMapView extends Fragment {
     private GooglePlaceList nearby;
     private final String TAG = "MAP_DEBUG";
     private String placesRequest;
+    private ArrayList<LatLng> markers;
 
 
     public FragmentNearMeMapView() {
@@ -75,6 +59,8 @@ public class FragmentNearMeMapView extends Fragment {
         mapView = (MapView) v.findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
 
+        markers = new ArrayList<>();
+
         mapView.onResume(); // needed to get the map to display immediately
 
         try {
@@ -90,7 +76,7 @@ public class FragmentNearMeMapView extends Fragment {
 
         String type = URLEncoder.encode(((NearMe) getActivity()).getActivity());
         placesRequest = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
-                lat + "," + lng + "&radius=" + radius + "&key=" + getString(R.string.places_key);
+                lat + "," + lng + "&radius=" + radius + "&key=" + getResources().getString(R.string.places_key);
 
         NearMeAsync nearMeAsync = new NearMeAsync();
 
@@ -114,9 +100,12 @@ public class FragmentNearMeMapView extends Fragment {
 
                 //googleMap.addMarker(new MarkerOptions().position(userPos).title("").snippet("Marker Description"));
 
+
+
+
                 // For zooming automatically to the location of the marker
-                CameraPosition cameraPosition = new CameraPosition.Builder().target(userPos).zoom(10).build();
-                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                //CameraPosition cameraPosition = new CameraPosition.Builder().target(userPos).zoom(10).build();
+                //googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             }
         });
 
@@ -136,9 +125,10 @@ public class FragmentNearMeMapView extends Fragment {
         protected List<SimpleGooglePlace> doInBackground(Double... params) {
             //call which will return list of google places that are near a lat and long
 
+            GooglePlacesUtility util = new GooglePlacesUtility();
             List<SimpleGooglePlace> places = new ArrayList<SimpleGooglePlace>();
             try {
-                places = networkCall();
+                places = util.networkCall(getPlacesRequestURL());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -148,91 +138,26 @@ public class FragmentNearMeMapView extends Fragment {
 
         @Override
         protected void onPostExecute(List<SimpleGooglePlace> googlePlaces) {
+
             for (SimpleGooglePlace place : googlePlaces) {
                 LatLng pos = new LatLng(place.getLatitude(), place.getLongitude());
-
-
                 String rating = String.valueOf(place.getRating());
+                markers.add(pos);
                 googleMap.addMarker(new MarkerOptions().position(pos).title(place.getName()).snippet(rating));
-
             }
+
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+
+            for(LatLng l : markers){
+                builder.include(l);
+            }
+
+            LatLngBounds bounds = builder.build();
+
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds,100));
 
         }
-    }
-
-    public List<SimpleGooglePlace> networkCall() throws Exception {
-        ArrayList<SimpleGooglePlace> result = new ArrayList<SimpleGooglePlace>();
-
-        String jsonData = urlRequest(getPlacesRequestURL());
-
-        JSONObject jsonObject = new JSONObject(jsonData);
-        JSONArray jsonArray = jsonObject.getJSONArray("results");
-
-
-        for (int i = 0; i < jsonArray.length(); i++) {
-            SimpleGooglePlace place = new SimpleGooglePlace();
-
-            double lat = jsonArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lat");
-            double lng = jsonArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lng");
-            String name = jsonArray.getJSONObject(i).getString("name");
-            String photoRef = jsonArray.getJSONObject(i).getString("reference");
-
-            boolean openNow = false;
-            String exceptionalDates = "";
-            String weekdayText = "";
-            if(jsonArray.getJSONObject(i).has("opening_hours")) {
-                openNow = jsonArray.getJSONObject(i).getJSONObject("opening_hours").getBoolean("open_now");
-                exceptionalDates = jsonArray.getJSONObject(i).getJSONObject("opening_hours").getJSONArray("exceptional_date").toString();
-                weekdayText = jsonArray.getJSONObject(i).getJSONObject("opening_hours").getJSONArray("weekday_text").toString();
-            }
-
-            double rating = 0.0;
-
-            if(jsonArray.getJSONObject(i).has("rating")){
-                rating = jsonArray.getJSONObject(i).getDouble("rating");
-            }
-
-            place.setLatitude(lat);
-            place.setLongitude(lng);
-            place.setName(name);
-            place.setPhotoRef(photoRef);
-            place.setOpenNow(openNow);
-            place.setRating(rating);
-            place.setExceptionalDates(exceptionalDates);
-            place.setWeekdayText(weekdayText);
-
-            result.add(place);
-        }
-
-
-        return result;
-    }
-
-    private String urlRequest(String s) throws Exception {
-        String request = getPlacesRequestURL();
-
-        StringBuilder sb = new StringBuilder();
-
-        URL url = new URL(s);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-        try {
-
-            InputStream in = new BufferedInputStream(conn.getInputStream());
-
-            BufferedReader bin = new BufferedReader(new InputStreamReader(in));
-
-            String inputLine;
-
-            while ((inputLine = bin.readLine()) != null) {
-                sb.append(inputLine);
-            }
-
-        } finally {
-            conn.disconnect();
-        }
-
-        return sb.toString();
     }
 
 

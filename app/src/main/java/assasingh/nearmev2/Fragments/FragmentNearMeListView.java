@@ -55,7 +55,7 @@ public class FragmentNearMeListView extends Fragment {
 
         String type = URLEncoder.encode(((NearMe)getActivity()).getActivity());
         String placesRequest = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
-                ((NearMe)getActivity()).getLatitude() + "," + ((NearMe)getActivity()).getLongitude() + "&radius=" + ((NearMe)getActivity()).getRadius() + "&key=" + getString(R.string.places_key);
+                ((NearMe)getActivity()).getLatitude() + "," + ((NearMe)getActivity()).getLongitude() + "&radius=" + ((NearMe)getActivity()).getRadius() + "&key=" + getResources().getString(R.string.places_key);
         PlacesReadFeed process = new PlacesReadFeed();
         try {
             process.execute(new String[]{placesRequest});

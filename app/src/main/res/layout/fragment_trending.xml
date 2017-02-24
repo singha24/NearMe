@@ -10,8 +10,8 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:srcCompat="@android:drawable/ic_menu_camera"
         android:id="@+id/trendingImageFrag"
+        android:scaleType="fitXY"
         android:layout_weight="1" />
 
     <TextView
