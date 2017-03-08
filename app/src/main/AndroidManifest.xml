@@ -22,7 +22,8 @@
         <activity
             android:name=".View.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,12 +33,14 @@
         <activity
             android:name=".View.FavouritePlaces"
             android:label="@string/title_activity_fav_places"
-            android:parentActivityName=".View.MainActivity" />
+            android:parentActivityName=".View.MainActivity"
+            android:configChanges="orientation|screenSize"/>
         <activity
             android:name=".View.DayPlan"
             android:label="@string/title_activity_day_plan"
             android:parentActivityName=".View.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="assasingh.nearmev2.View.MainActivity" />
@@ -45,12 +48,14 @@
         <activity android:name=".View.NearMe">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="assasingh.nearmev2.View.MainActivity" />
+                android:value="assasingh.nearmev2.View.MainActivity"
+                android:configChanges="orientation|screenSize"/>
         </activity>
         <activity
             android:name=".View.PostCard"
             android:label="@string/title_activity_postcard"
-            android:screenOrientation="landscape" />
+            android:screenOrientation="landscape"
+            android:configChanges="orientation|screenSize"/>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -63,7 +68,8 @@
 
         <activity android:name=".View.SettingsActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:label="@string/title_activity_settings">
+            android:label="@string/title_activity_settings"
+            android:configChanges="orientation|screenSize">
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

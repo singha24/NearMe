@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ import assasingh.nearmev2.Model.GooglePlaceList;
 import assasingh.nearmev2.Model.GooglePlacesUtility;
 import assasingh.nearmev2.Model.SimpleGooglePlace;
 import assasingh.nearmev2.R;
+import assasingh.nearmev2.Services.DatabaseHelper;
 import assasingh.nearmev2.View.NearMe;
 
 /**
@@ -38,11 +40,12 @@ import assasingh.nearmev2.View.NearMe;
 public class FragmentNearMeMapView extends Fragment {
 
     private MapView mapView;
-    private GoogleMap googleMap;
     private GooglePlaceList nearby;
     private final String TAG = "MAP_DEBUG";
     private String placesRequest;
-    private ArrayList<LatLng> markers;
+    LatLngBounds bounds;
+
+
 
 
     public FragmentNearMeMapView() {
@@ -59,7 +62,9 @@ public class FragmentNearMeMapView extends Fragment {
         mapView = (MapView) v.findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
 
-        markers = new ArrayList<>();
+
+
+
 
         mapView.onResume(); // needed to get the map to display immediately
 
@@ -69,43 +74,34 @@ public class FragmentNearMeMapView extends Fragment {
             e.printStackTrace();
         }
 
-        double lat = ((NearMe) getActivity()).getLatitude();
-        double lng = ((NearMe) getActivity()).getLongitude();
-        double radius = ((NearMe) getActivity()).getRadius();
 
 
-        String type = URLEncoder.encode(((NearMe) getActivity()).getActivity());
-        placesRequest = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
-                lat + "," + lng + "&radius=" + radius + "&key=" + getResources().getString(R.string.places_key);
 
-        NearMeAsync nearMeAsync = new NearMeAsync();
 
-        nearMeAsync.execute(); //new thread
+        bounds = null;
+        for(int i =0; i< NearMe.markers.size(); i++){
+            bounds.including(NearMe.markers.get(i));
+        }
+
+        //NearMe.googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds,100));
 
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap mMap) {
-                googleMap = mMap;
+                NearMe.googleMap = mMap;
 
                 // For showing a move to my location button
                 if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
                     return;
                 }
-                googleMap.setMyLocationEnabled(true);
+                NearMe.googleMap.setMyLocationEnabled(true);
 
 
                 // For dropping a marker at a point on the Map
                 LatLng userPos = new LatLng(((NearMe) getActivity()).getLatitude(), ((NearMe) getActivity()).getLongitude());
 
-                //googleMap.addMarker(new MarkerOptions().position(userPos).title("").snippet("Marker Description"));
 
-
-
-
-                // For zooming automatically to the location of the marker
-                //CameraPosition cameraPosition = new CameraPosition.Builder().target(userPos).zoom(10).build();
-                //googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             }
         });
 
@@ -140,22 +136,12 @@ public class FragmentNearMeMapView extends Fragment {
         protected void onPostExecute(List<SimpleGooglePlace> googlePlaces) {
 
             for (SimpleGooglePlace place : googlePlaces) {
-                LatLng pos = new LatLng(place.getLatitude(), place.getLongitude());
+
+
                 String rating = String.valueOf(place.getRating());
-                markers.add(pos);
-                googleMap.addMarker(new MarkerOptions().position(pos).title(place.getName()).snippet(rating));
+
+
             }
-
-            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
-
-            for(LatLng l : markers){
-                builder.include(l);
-            }
-
-            LatLngBounds bounds = builder.build();
-
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds,100));
 
         }
     }

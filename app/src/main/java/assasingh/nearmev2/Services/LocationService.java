@@ -27,6 +27,8 @@ public class LocationService extends Service implements android.location.Locatio
     LocationListener[] mLocationListeners;
     private boolean isNetworkEnabled = false;
 
+    DatabaseHelper dbh = new DatabaseHelper(this);
+
     // The minimum distance to change Updates in meters
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
 
@@ -98,6 +100,10 @@ public class LocationService extends Service implements android.location.Locatio
 
         //Toast.makeText(this, location.getLatitude() + " : " + location.getLongitude(), Toast.LENGTH_LONG).show();
         Log.e(TAG, getLongitude().toString() + " : " + getLatitude().toString());
+
+
+        dbh.insertLatLng(getLatitude(),getLongitude());
+
         return START_STICKY;
     }
 
@@ -139,11 +145,13 @@ public class LocationService extends Service implements android.location.Locatio
                         if(isNetworkEnabled) {
                             setLatitude(getNetworkLocation().getLatitude());
                             setLongitude(getNetworkLocation().getLongitude());
+                            dbh.insertLatLng(getLatitude(),getLongitude());
                         }
 
                         setLatitude(getGPSLocation().getLatitude());
                         setLongitude(getGPSLocation().getLongitude());
 
+                        dbh.insertLatLng(getGPSLocation().getLatitude(),getGPSLocation().getLongitude());
                     }
                 }
         };
@@ -174,6 +182,7 @@ public class LocationService extends Service implements android.location.Locatio
                 if (location != null) {
                     latitude = location.getLatitude();
                     longitude = location.getLongitude();
+                    dbh.insertLatLng(latitude,longitude);
                 }
             }
         }

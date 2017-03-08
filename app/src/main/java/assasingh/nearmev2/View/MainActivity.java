@@ -7,22 +7,19 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.provider.ContactsContract;
 import android.provider.Settings;
 import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewPager;
 import android.text.InputType;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -34,12 +31,9 @@ import android.support.v7.widget.Toolbar;
 import android.support.v4.app.FragmentManager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -53,18 +47,18 @@ import assasingh.nearmev2.Fragments.FirstFragment;
 import assasingh.nearmev2.Fragments.SecondFragment;
 import assasingh.nearmev2.Fragments.ThirdFragment;
 import assasingh.nearmev2.Adaptors.ListViewAdapter;
-import assasingh.nearmev2.Model.DatabaseOperations;
 import assasingh.nearmev2.R;
+import assasingh.nearmev2.Services.DatabaseHelper;
 import assasingh.nearmev2.Services.LocationService;
 
 import android.view.MotionEvent;
-import android.gesture.Gesture;
+
 import static android.view.GestureDetector.*;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnGestureListener, OnDoubleTapListener {
 
-    private static String [] menu = {"Your Day Plan", "Near Me", "Favourite Places", "More"};
+    private static String [] menu = {"Your Day Plan", "Near Me", "Favourite Places", "My Preferences"};
     private static Integer[] menuImages = {R.drawable.list, R.drawable.location, R.drawable.heart, R.drawable.more};
 
     private String speechInput = "";
@@ -77,6 +71,7 @@ public class MainActivity extends AppCompatActivity
 
     private ViewPager viewPager;
     private LocationService locationService;
+    public static DatabaseHelper db;
 
 
     @Override
@@ -91,8 +86,13 @@ public class MainActivity extends AppCompatActivity
 
         viewPager = (ViewPager) findViewById(R.id.trending);
 
+        db = new DatabaseHelper(this);
+
+
         TrendingAdapter trendingAdapter = new TrendingAdapter (getSupportFragmentManager());
+
         viewPager.setAdapter(trendingAdapter);
+
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -180,6 +180,18 @@ public class MainActivity extends AppCompatActivity
             intent.putExtra("lat", LocationService.getLatitude());
             intent.putExtra("lon", LocationService.getLongitude());
             startActivity(intent);
+        }else{
+            Toast.makeText(this, "Using last known location",Toast.LENGTH_LONG).show();
+            Cursor res = db.getLastKnownLocation();
+            double lat = Double.parseDouble(res.getString(res.getColumnIndexOrThrow("lat")));
+            double lng = Double.parseDouble(res.getString(res.getColumnIndexOrThrow("lng")));
+
+            Intent intent = new Intent(this, NearMe.class);
+            intent.putExtra("lat", lat);
+            intent.putExtra("lon", lng);
+            startActivity(intent);
+
+
         }
     }
 
@@ -227,8 +239,7 @@ public class MainActivity extends AppCompatActivity
             public void onClick(DialogInterface dialog, int which) {
                 speechInput = userTextInput.getText().toString();
 
-                DatabaseOperations dbo = new DatabaseOperations(getApplicationContext());
-                dbo.insertQuery(dbo,getTextFromSpeech());
+                //TODO store speech input into DB
 
                 Toast.makeText(getApplicationContext(), getTextFromSpeech(), Toast.LENGTH_SHORT).show();
             }

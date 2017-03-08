@@ -2,6 +2,7 @@ package assasingh.nearmev2.Fragments;
 
 
 import android.app.ProgressDialog;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,6 +18,7 @@ import com.google.gson.Gson;
 
 import java.net.URLEncoder;
 
+import assasingh.nearmev2.Adaptors.NearMeListResultAdaptor;
 import assasingh.nearmev2.Model.GooglePlaceList;
 import assasingh.nearmev2.Model.GooglePlacesUtility;
 import assasingh.nearmev2.R;
@@ -46,89 +48,23 @@ public class FragmentNearMeListView extends Fragment {
         View v = inflater.inflate(R.layout.fragment_near_me_list_view, container, false);
 
         list = (ListView) v.findViewById(R.id.the_list);
-        nearby = null;
 
+        Cursor c = NearMe.db.getAllFromPlacesTable();
 
-        //Toast.makeText(getActivity(), "activity: " + ((NearMe)getActivity()).getActivity() + " radius: " + ((NearMe)getActivity()).getRadius() + " lat: " + ((NearMe)getActivity()).getLatitude() + " lon: " + ((NearMe)getActivity()).getLongitude(), Toast.LENGTH_LONG).show();
-
-        Log.e("PLACES_EXAMPLE", getString(R.string.places_key));
-
-        String type = URLEncoder.encode(((NearMe)getActivity()).getActivity());
-        String placesRequest = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
-                ((NearMe)getActivity()).getLatitude() + "," + ((NearMe)getActivity()).getLongitude() + "&radius=" + ((NearMe)getActivity()).getRadius() + "&key=" + getResources().getString(R.string.places_key);
-        PlacesReadFeed process = new PlacesReadFeed();
-        try {
-            process.execute(new String[]{placesRequest});
-        } catch (Exception e) {
-            Log.e("NearMe Async Task Error", e.toString());
+        if(c.getCount() == 0){
+            Toast.makeText(getActivity(),"Oops", Toast.LENGTH_LONG).show();
         }
+
+
+        NearMeListResultAdaptor adap = new NearMeListResultAdaptor(getActivity(), c);
+
+        list.setAdapter(adap);
+
+        nearby = null;
 
         return v;
 
 
-    }
-
-    protected void reportBack(GooglePlaceList nearby) {
-
-        if (this.nearby == null) {
-            this.nearby = nearby;
-
-        } else {
-            this.nearby.getResults().addAll(nearby.getResults());
-        }
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_list_item_1, this.nearby.getPlaceNames());
-        list.setAdapter(adapter);
-    }
-
-
-    private class PlacesReadFeed extends AsyncTask<String, Void, GooglePlaceList> {
-        private final ProgressDialog dialog = new ProgressDialog(getActivity());
-
-        @Override
-        protected GooglePlaceList doInBackground(String... urls) {
-            try {
-                String referer = null;
-                //dialog.setMessage("Fetching Places Data");
-                if (urls.length == 1) {
-                    referer = null;
-                } else {
-                    referer = urls[1];
-                }
-                String input = GooglePlacesUtility.readGooglePlaces(urls[0], referer);
-                Gson gson = new Gson();
-                GooglePlaceList places = gson.fromJson(input, GooglePlaceList.class);
-                Log.i("PLACES_EXAMPLE", "Number of places found is " + places.getResults().size());
-                return places;
-            } catch (Exception e) {
-                e.printStackTrace();
-                Log.i("PLACES_EXAMPLE", "PLACES RESULT ERROR");
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPreExecute() {
-            try {
-                this.dialog.setMessage("Getting nearby places...");
-
-                this.dialog.show();
-            } catch (Exception e) {
-                Log.e("Dialog error", "unable to display dialog box on getting places");
-            }
-        }
-
-        @Override
-        protected void onPostExecute(GooglePlaceList places) {
-            try {
-                this.dialog.dismiss();
-                reportBack(places);
-            } catch (Exception e) {
-                Toast.makeText(getActivity(), "Well, err. This is embarrassing.", Toast.LENGTH_SHORT).show();
-                Log.e("REPORT BACK ERROR", "OnPostExecute");
-            }
-        }
     }
 }
 

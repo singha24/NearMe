@@ -1,10 +1,12 @@
 package assasingh.nearmev2.View;
 
 
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,8 +35,8 @@ public class TrendingFragment extends Fragment {
     private String URL = "";
 
     private LocationService ls;
-    private ArrayList<Drawable> drawables;
-    private ArrayList<String> names;
+    private Drawable drawable;
+    private String name = "";
 
 
     public TrendingFragment() {
@@ -62,16 +64,9 @@ public class TrendingFragment extends Fragment {
         //gi.execute(URL);
 
 
-
         return view;
     }
 
-    public String getPlacesRequestURL() {
-        String s = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
-                getLat() + "," + getLng() + "&radius=" + getRadius() + "&key=" + getResources().getString(R.string.places_key);
-
-        return s;
-    }
 
     public double getLat() {
         return ls.getLatitude();
@@ -91,43 +86,38 @@ public class TrendingFragment extends Fragment {
         @Override
         protected List<SimpleGooglePlace> doInBackground(String... params) {
 
-            GooglePlacesUtility util = new GooglePlacesUtility();
-            List<SimpleGooglePlace> places = new ArrayList<SimpleGooglePlace>();
+            Cursor ref = MainActivity.db.getImages();
 
-            drawables = new ArrayList<>();
-            names = new ArrayList<>();
+            String r = "";
+
+            r = ref.getString(ref.getColumnIndexOrThrow("photo_ref"));
+            name = ref.getString(ref.getColumnIndexOrThrow("name"));
+
+
+            Log.d("TRENDING", r);
 
             try {
-                places = util.networkCall(getPlacesRequestURL());
 
-                for (SimpleGooglePlace p : places) {
-                    String photoRefUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2000&photoreference=" + p.getPhotoRef() + "&key=" + getResources().getString(R.string.places_key);
-                    //Log.d(TAG, photoRefUrl);
-                    InputStream is = (InputStream) new URL(photoRefUrl).getContent();
-                    Drawable d = Drawable.createFromStream(is, "src name");
+                String photoRefUrl = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=2000&photoreference=" + r + "&key=" + getResources().getString(R.string.places_key);
+                //Log.d(TAG, photoRefUrl);
+                InputStream is = (InputStream) new URL(photoRefUrl).getContent();
+                Drawable d = Drawable.createFromStream(is, "src name");
 
-                    drawables.add(d);
-                    names.add(p.getName());
-
-                }
-            }catch (Exception e) {
+                drawable = d;
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 
-
-            return places;
+            return null;
         }
 
         @Override
         protected void onPostExecute(List<SimpleGooglePlace> places) {
 
-            /*for(int i = 0; i<drawables.size(); i++){
-                image.setImageDrawable(drawables.get(i));
-            }
 
-            for(int j = 0; j<names.size(); j++){
-                count.setText(names.get(j));
-            }*/
+            image.setImageDrawable(drawable);
+            count.setText(name);
+
         }
 
 
