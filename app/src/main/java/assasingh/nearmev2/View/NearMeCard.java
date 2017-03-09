@@ -83,7 +83,7 @@ public class NearMeCard extends AppCompatActivity {
         beenHereBefore = (ImageView) findViewById(R.id.done);
         addToDayPlan = (Button) findViewById(R.id.dayPlan);
 
-        addToDayPlan.setBackgroundColor(Color.parseColor("#2469B2"));
+        addToDayPlan.setBackgroundColor(Color.parseColor("#b2bcbc"));
 
 
         String photoRef = "";
@@ -97,7 +97,7 @@ public class NearMeCard extends AppCompatActivity {
                 if (s)
                     openNow.setText("Open");
                 else
-                    openNow.setText(":( look's like their closed Jim");
+                    openNow.setText(":( look's like they're closed Jim");
 
                 description.setText(cursor.getString(cursor.getColumnIndexOrThrow("rating")) + " stars (this is meant to be the description)");
 
