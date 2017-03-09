@@ -78,12 +78,13 @@ public class FragmentNearMeMapView extends Fragment {
 
 
 
-        bounds = null;
-        for(int i =0; i< NearMe.markers.size(); i++){
-            bounds.including(NearMe.markers.get(i));
-        }
 
-        //NearMe.googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds,100));
+
+        //
+        //NearMe.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.5009146, -1.9371191), 100));
+
+
+
 
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
@@ -96,6 +97,27 @@ public class FragmentNearMeMapView extends Fragment {
                     return;
                 }
                 NearMe.googleMap.setMyLocationEnabled(true);
+
+                CameraPosition position = CameraPosition.builder()
+                        .target( new LatLng(52.5009146, -1.9371191) )
+                        .zoom( 12.0f )
+                        .build();
+
+                NearMe.googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(position), null);
+
+
+//                /NearMe.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ll, 10));
+                //NearMe.googleMap.setOnCameraIdleListener(NearMe.clusterManager);
+                NearMe.googleMap.setOnMarkerClickListener(NearMe.clusterManager);
+
+
+
+                /*bounds = null;
+                for(int i =0; i< NearMe.markers.size(); i++){
+                    bounds.including(NearMe.markers.get(i));
+                }
+
+                NearMe.googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds,100));*/
 
 
                 // For dropping a marker at a point on the Map

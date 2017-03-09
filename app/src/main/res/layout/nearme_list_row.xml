@@ -33,7 +33,7 @@
             android:typeface="sans" />
 
         <TextView
-            android:id="@+id/openNow"
+            android:id="@+id/distance"
             android:text="4.0"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

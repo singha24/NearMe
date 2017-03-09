@@ -2,6 +2,7 @@ package assasingh.nearmev2.Fragments;
 
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -24,12 +26,14 @@ import assasingh.nearmev2.Model.GooglePlacesUtility;
 import assasingh.nearmev2.R;
 import assasingh.nearmev2.Services.LocationService;
 import assasingh.nearmev2.View.NearMe;
+import assasingh.nearmev2.View.NearMeCard;
 
 public class FragmentNearMeListView extends Fragment {
 
 
     private GooglePlaceList nearby;
     private ListView list;
+    Cursor cursor;
 
     public FragmentNearMeListView() {
         // Required empty public constructor
@@ -49,16 +53,30 @@ public class FragmentNearMeListView extends Fragment {
 
         list = (ListView) v.findViewById(R.id.the_list);
 
-        Cursor c = NearMe.db.getAllFromPlacesTable();
+        cursor = NearMe.db.getAllFromPlacesTable();
 
-        if(c.getCount() == 0){
-            Toast.makeText(getActivity(),"Oops", Toast.LENGTH_LONG).show();
+        if(cursor.getCount() == 0){
+            Toast.makeText(getActivity(),"Oops, where did all the places go? :(", Toast.LENGTH_LONG).show();
         }
 
 
-        NearMeListResultAdaptor adap = new NearMeListResultAdaptor(getActivity(), c);
+        NearMeListResultAdaptor adap = new NearMeListResultAdaptor(getActivity(), cursor);
 
         list.setAdapter(adap);
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                cursor.moveToPosition(position);
+                long id = cursor.getLong(cursor.getColumnIndex("_id"));
+
+                Intent i = new Intent(getActivity(), NearMeCard.class);
+                i.putExtra("id", id);
+                startActivity(i);
+
+            }
+        });
+
 
         nearby = null;
 

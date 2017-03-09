@@ -11,9 +11,18 @@ public class SimpleGooglePlace {
     private String name;
     private String photoRef;
     private double rating;
-    private boolean openNow;
+    private String openNow;
     private String exceptionalDates;
     private String weekdayText;
+    private String types;
+
+    public String getTypes() {
+        return types;
+    }
+
+    public void setTypes(String types) {
+        this.types = types;
+    }
 
     public String getExceptionalDates() {
         return exceptionalDates;
@@ -39,11 +48,11 @@ public class SimpleGooglePlace {
         this.rating = rating;
     }
 
-    public void setOpenNow(boolean openNow) {
+    public void setOpenNow(String openNow) {
         this.openNow = openNow;
     }
 
-    public boolean getOpenNow(){
+    public String getOpenNow(){
         return openNow;
     }
 

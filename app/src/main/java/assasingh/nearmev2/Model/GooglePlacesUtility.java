@@ -103,14 +103,25 @@ public class GooglePlacesUtility {
                 photoRef = jsonArray.getJSONObject(i).getJSONArray("photos").getJSONObject(0).getString("photo_reference");
             }
 
-            boolean openNow = false;
+            String openNow = "false";
             String exceptionalDates = "";
             String weekdayText = "";
             if(jsonArray.getJSONObject(i).has("opening_hours")) {
-                openNow = jsonArray.getJSONObject(i).getJSONObject("opening_hours").getBoolean("open_now");
+                openNow = jsonArray.getJSONObject(i).getJSONObject("opening_hours").getString("open_now");
                 exceptionalDates = jsonArray.getJSONObject(i).getJSONObject("opening_hours").getJSONArray("exceptional_date").toString();
                 weekdayText = jsonArray.getJSONObject(i).getJSONObject("opening_hours").getJSONArray("weekday_text").toString();
             }
+
+            String types = "";
+
+            if(jsonArray.getJSONObject(i).has("types")){
+                for(int j = 0; j < jsonArray.getJSONObject(i).getJSONArray("types").length(); j++){
+                    types += "+" + jsonArray.getJSONObject(i).getJSONArray("types").getString(j);
+                }
+                Log.d("UTILITY", types);
+            }
+
+
 
             double rating = 0.0;
 
@@ -126,6 +137,7 @@ public class GooglePlacesUtility {
             place.setRating(rating);
             place.setExceptionalDates(exceptionalDates);
             place.setWeekdayText(weekdayText);
+            place.setTypes(types);
 
             result.add(place);
         }
