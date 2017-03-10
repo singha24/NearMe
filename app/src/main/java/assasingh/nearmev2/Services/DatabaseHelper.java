@@ -120,7 +120,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return c;
     }
 
-    public void deletePlacesTable(){
+    public void refreshPlacesTable(){
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("delete from "+ PLACES_TABLE);
     }
