@@ -106,11 +106,7 @@ public class GooglePlacesUtility {
             String openNow = "false";
             String exceptionalDates = "";
             String weekdayText = "";
-            if(jsonArray.getJSONObject(i).has("opening_hours")) {
-                openNow = jsonArray.getJSONObject(i).getJSONObject("opening_hours").getString("open_now");
-                exceptionalDates = jsonArray.getJSONObject(i).getJSONObject("opening_hours").getJSONArray("exceptional_date").toString();
-                weekdayText = jsonArray.getJSONObject(i).getJSONObject("opening_hours").getJSONArray("weekday_text").toString();
-            }
+
 
             String types = "";
 
@@ -129,6 +125,34 @@ public class GooglePlacesUtility {
                 rating = jsonArray.getJSONObject(i).getDouble("rating");
             }
 
+            String placeID = jsonArray.getJSONObject(i).getString("place_id");
+
+            Log.d("PLACE_ID", placeID);
+
+            String extraInfoUrl = "https://maps.googleapis.com/maps/api/place/details/json?placeid="+placeID+"&key=AIzaSyB3Qirj2H1pL_63c7yXcMIMCjcQUinyHS4";
+
+            String res = urlRequest(extraInfoUrl);
+            JSONObject jObject = new JSONObject(res);
+
+            JSONObject obj = jObject.getJSONObject("result");
+
+            String address = obj.getString("formatted_address");
+
+            String phone = "";
+
+            if(obj.has("formatted_phone_number")){
+                phone = obj.getString("formatted_phone_number");
+            }
+
+            if(obj.has("opening_hours")) {
+                openNow = obj.getJSONObject("opening_hours").getString("open_now");
+                exceptionalDates = obj.getJSONObject("opening_hours").getJSONArray("exceptional_date").toString();
+                for(int j = 0; j <= 6; j++) {
+                    weekdayText += obj.getJSONObject("opening_hours").getJSONArray("weekday_text").getString(j) + "+";
+                }
+            }
+
+
             place.setLatitude(lat);
             place.setLongitude(lng);
             place.setName(name);
@@ -138,6 +162,8 @@ public class GooglePlacesUtility {
             place.setExceptionalDates(exceptionalDates);
             place.setWeekdayText(weekdayText);
             place.setTypes(types);
+            place.setAddress(address);
+            place.setPhone(phone);
 
             result.add(place);
         }

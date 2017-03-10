@@ -36,6 +36,7 @@ public class NearMeListResultAdaptor extends CursorAdapter {
     boolean open;
     String n;
     String r;
+    String photoRef;
 
 
     public NearMeListResultAdaptor(Context context, Cursor c) {
@@ -55,36 +56,39 @@ public class NearMeListResultAdaptor extends CursorAdapter {
         distanceFromUser = (TextView) view.findViewById(R.id.distance);
         rating = (TextView) view.findViewById(R.id.rating);
 
-        n = cursor.getString(cursor.getColumnIndexOrThrow("name"));
-        String o = cursor.getString(cursor.getColumnIndexOrThrow("open_now"));
-        r = cursor.getString(cursor.getColumnIndexOrThrow("rating"));
-        String photoRef = cursor.getString(cursor.getColumnIndexOrThrow("photo_ref"));
+        while(cursor.moveToNext()) {
 
-        lat = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow("lat")));
-        lng = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow("lng")));
+            n = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+            String o = cursor.getString(cursor.getColumnIndexOrThrow("open_now"));
+            r = cursor.getString(cursor.getColumnIndexOrThrow("rating"));
+            photoRef = cursor.getString(cursor.getColumnIndexOrThrow("photo_ref"));
 
-        double userLat = ((NearMe) context).getLatitude();
-        double userLng = ((NearMe) context).getLongitude();
+            lat = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow("lat")));
+            lng = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow("lng")));
 
-        distance = (int) distance(lat, lng, userLat, userLng, 'M');
+            double userLat = ((NearMe) context).getLatitude();
+            double userLng = ((NearMe) context).getLongitude();
 
-        open = Boolean.valueOf(o);
+            distance = (int) distance(lat, lng, userLat, userLng, 'M');
 
-        name.setText(n);
+            open = Boolean.valueOf(o);
 
-        if (!open) {
-            //distanceFromUser.setVisibility(View.GONE);
+            name.setText(n);
+
+            if (!open) {
+                //distanceFromUser.setVisibility(View.GONE);
+            }
+            distanceFromUser.setText(String.valueOf(distance) + " meters away!");
+
+            rating.setText(r + " stars");
         }
-        distanceFromUser.setText(String.valueOf(distance) + " meters away!");
-
-        rating.setText(r + " stars");
 
 
         GetImageFromUrl get = new GetImageFromUrl();
 
         String url = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + photoRef + "&key=" + context.getResources().getString(R.string.places_key);
 
-        get.execute(url);
+        //get.execute(url);
 
 
     }

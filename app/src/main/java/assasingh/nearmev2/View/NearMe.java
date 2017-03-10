@@ -231,7 +231,7 @@ public class NearMe extends AppCompatActivity {
                 clusterManager.addItem(markerLocation);
 
                 boolean success = db.insertPlace(place.getLatitude(),place.getLongitude(),place.getName(),place.getPhotoRef(),place.getRating(), place.getOpenNow(), place.getWeekdayText(), place.getTypes());
-
+                Log.d("INSER", String.valueOf(success));
 
             }
 
