@@ -1,11 +1,13 @@
 package assasingh.nearmev2.View;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -130,8 +132,21 @@ public class NearMeCard extends AppCompatActivity {
         placeImage.setVisibility(View.INVISIBLE);
         progressBar.setVisibility(View.VISIBLE);
 
+        love.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                vibrate();
+            }
+        });
 
 
+
+    }
+
+    public void vibrate(){
+        Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
+        // Vibrate for 500 milliseconds
+        v.vibrate(50);
     }
 
     private class GetImageFromUrl extends AsyncTask<String, Void, Drawable> {

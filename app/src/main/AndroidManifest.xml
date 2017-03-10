@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
+
     <permission
         android:name="android.permission.MAPS_RECEIVE"
         android:protectionLevel="signature" />
