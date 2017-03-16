@@ -56,16 +56,16 @@
                             android:layout_height="60dp"
                             android:layout_gravity="bottom|right"
                             android:paddingRight="10dp"
-                            android:tint="#000000"
-                            android:src="@drawable/tick" />
+                            android:src="@drawable/tick"
+                            android:tint="#000000" />
 
-                        <ImageView
+                        <Button
                             android:id="@+id/heart"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
-                            android:layout_gravity="bottom|center_horizontal"
                             android:layout_marginBottom="-35dp"
-                            android:src="@drawable/heart" />
+                            android:layout_gravity="bottom|center_horizontal"
+                            android:background="@drawable/heart"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp" />
 
 
                     </FrameLayout>
@@ -73,15 +73,15 @@
 
                     <TextView
                         android:id="@+id/name"
-                        android:textStyle="bold"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="left"
-                        android:textAlignment="center"
                         android:paddingLeft="20dp"
                         android:paddingTop="30dp"
                         android:text="Title"
-                        android:textSize="20sp" />
+                        android:textAlignment="center"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
 
                 </LinearLayout>
 
@@ -103,11 +103,10 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:paddingTop="12dp"
                         android:gravity="left"
+                        android:paddingTop="12dp"
                         android:text="Open Today 11am to 11pm"
-                        android:textSize="20sp"
-                         />
+                        android:textSize="20sp" />
 
                 </LinearLayout>
 
@@ -238,19 +237,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0"
+                android:orientation="vertical"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
-                android:paddingTop="5dp"
-                android:orientation="vertical">
+                android:paddingTop="5dp">
 
                 <Button
                     android:id="@+id/dayPlan"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:textStyle="bold"
                     android:background="@drawable/button_border"
+                    android:text="I want to visit this place"
                     android:textColor="#ffffff"
-                    android:text="I want to visit this place"/>
+                    android:textStyle="bold" />
 
             </LinearLayout>
 

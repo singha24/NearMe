@@ -1,10 +1,13 @@
 package assasingh.nearmev2.Model;
 
+import com.google.android.gms.maps.model.LatLng;
+import com.google.maps.android.clustering.ClusterItem;
+
 /**
  * Created by Assa on 23/02/2017.
  */
 
-public class SimpleGooglePlace {
+public class SimpleGooglePlace implements ClusterItem {
 
     private double latitude;
     private double longitude;
@@ -17,6 +20,12 @@ public class SimpleGooglePlace {
     private String types;
     String phone;
     String address;
+
+    private final LatLng mPosition;
+
+    public SimpleGooglePlace(double lat, double lng) {
+        mPosition = new LatLng(lat,lng);
+    }
 
     public String getAddress() {
         return address;
@@ -104,5 +113,20 @@ public class SimpleGooglePlace {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public LatLng getPosition() {
+        return mPosition;
+    }
+
+    @Override
+    public String getTitle() {
+        return name;
+    }
+
+    @Override
+    public String getSnippet() {
+        return String.valueOf(rating);
     }
 }

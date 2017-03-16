@@ -91,11 +91,13 @@ public class GooglePlacesUtility {
 
 
         for (int i = 0; i < jsonArray.length(); i++) {
-            SimpleGooglePlace place = new SimpleGooglePlace();
+
 
             double lat = jsonArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lat");
             double lng = jsonArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lng");
             String name = jsonArray.getJSONObject(i).getString("name");
+
+            SimpleGooglePlace place = new SimpleGooglePlace(lat, lng);
 
             String photoRef = "";
 

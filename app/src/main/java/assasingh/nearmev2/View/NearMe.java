@@ -1,11 +1,7 @@
 package assasingh.nearmev2.View;
 
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,19 +13,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.gson.Gson;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.net.URLEncoder;
@@ -38,14 +27,10 @@ import java.util.List;
 
 import assasingh.nearmev2.Fragments.FragmentNearMeListView;
 import assasingh.nearmev2.Fragments.FragmentNearMeMapView;
-import assasingh.nearmev2.Model.ClusterMarkerLocation;
-import assasingh.nearmev2.Model.GooglePlaceList;
 import assasingh.nearmev2.Model.GooglePlacesUtility;
 import assasingh.nearmev2.Model.SimpleGooglePlace;
 import assasingh.nearmev2.R;
 import assasingh.nearmev2.Services.DatabaseHelper;
-
-import static android.R.attr.radius;
 
 public class NearMe extends AppCompatActivity {
 
@@ -57,15 +42,23 @@ public class NearMe extends AppCompatActivity {
     private String activity;
     private double latitude;
     private double longitude;
-    private String placesRequest;
+    public static String placesRequest;
+
     public static GoogleMap googleMap;
     public static ArrayList<LatLng> markers;
+
+    MyPagerAdapter adapterViewPager;
+
     ProgressDialog progress;
 
+    static List<SimpleGooglePlace> places;
 
-    public static ClusterManager<ClusterMarkerLocation> clusterManager;
 
     public static DatabaseHelper db;
+    private ClusterManager<SimpleGooglePlace> mClusterManager;
+    LatLngBounds.Builder boundsBuilder;
+
+    public static LatLngBounds bounds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,18 +72,15 @@ public class NearMe extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
-
         db = new DatabaseHelper(this);
 
         Bundle b = getIntent().getExtras();
         latitude = b.getDouble("lat");
         longitude = b.getDouble("lon");
-        radius = 1000;
+        radius = 100;
         activity = "fun";
 
-        markers = new ArrayList<>();
-
-        LatLng ll = new LatLng(latitude,longitude);
+        LatLng ll = new LatLng(latitude, longitude);
 
         String type = URLEncoder.encode(getActivity());
         placesRequest = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
@@ -100,103 +90,96 @@ public class NearMe extends AppCompatActivity {
 
         setTitle(activity + " : " + convertRadiusToMiles(radius));
 
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        /*SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         if (!prefs.getBoolean("firstTime", false)) {
             // <---- run your one time code here
-            databaseSetup();
 
             // mark first time has runned.
             SharedPreferences.Editor editor = prefs.edit();
             editor.putBoolean("firstTime", true);
             editor.commit();
-        }
+        }*/
 
-        markers();
-
-        clusterManager = new ClusterManager<ClusterMarkerLocation>(this, googleMap);
-
+        adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
-        setupViewPager(viewPager);
+        viewPager.setAdapter(adapterViewPager);
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
-    }
-
-    void databaseSetup(){
 
         NearMeAsync nearMeAsync = new NearMeAsync();
         nearMeAsync.execute(); //new thread
 
-        progress = ProgressDialog.show(this, "dialog title",
-                "dialog message", true);
+        progress = ProgressDialog.show(this, "Hold on tight!",
+                "Doing some very technical stuff in the background right now..", true);
+
     }
 
-    void markers(){
-        Markers nearMeAsync = new Markers();
-        nearMeAsync.execute(); //new thread
-    }
-
-    public String getPlacesRequestURL() {
+    public static String getPlacesRequestURL() {
         return placesRequest;
     }
 
-    public double convertRadiusToMiles(double r){
+    public double convertRadiusToMiles(double r) {
         return Math.ceil(r * 0.00062137);
     }
 
-    public String getActivity(){return activity; }
+    public String getActivity() {
+        return activity;
+    }
 
-    public int getRadius(){
+    public int getRadius() {
         return radius;
     }
 
-    public double getLongitude(){
+    public double getLongitude() {
         return longitude;
     }
 
-    public double getLatitude(){
+    public double getLatitude() {
         return latitude;
     }
 
-    private void setupViewPager(ViewPager viewPager) {
-
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(new FragmentNearMeMapView(), "Map");
-        adapter.addFragment(new FragmentNearMeListView(), "List");
-
-        viewPager.setAdapter(adapter);
+    public static List<SimpleGooglePlace> getPlaces() {
+        return places;
     }
 
-    class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
+    public static class MyPagerAdapter extends FragmentPagerAdapter {
 
-        public ViewPagerAdapter(FragmentManager manager) {
-            super(manager);
+        private static int NUM_ITEMS = 2;
+
+        public MyPagerAdapter(FragmentManager fragmentManager) {
+            super(fragmentManager);
         }
 
-        @Override
-        public Fragment getItem(int position) {
-            return mFragmentList.get(position);
-        }
-
+        // Returns total number of pages
         @Override
         public int getCount() {
-            return mFragmentList.size();
+            return NUM_ITEMS;
         }
 
-        public void addFragment(Fragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
+        // Returns the fragment to display for that page
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0: // Fragment # 0 - This will show FirstFragment
+                    return FragmentNearMeListView.newInstance(0, "List");
+                case 1: // Fragment # 0 - This will show FirstFragment different title
+                    return FragmentNearMeMapView.newInstance(1, "Map");
+
+                default:
+                    return null;
+            }
         }
 
+        // Returns the page title for the top indicator
         @Override
         public CharSequence getPageTitle(int position) {
-            return mFragmentTitleList.get(position);
+            return "Page " + position;
         }
+
+
     }
 
     private class NearMeAsync extends AsyncTask<Double, Integer, List<SimpleGooglePlace>> {
@@ -207,7 +190,7 @@ public class NearMe extends AppCompatActivity {
             //call which will return list of google places that are near a lat and long
 
             GooglePlacesUtility util = new GooglePlacesUtility();
-            List<SimpleGooglePlace> places = new ArrayList<SimpleGooglePlace>();
+            places = new ArrayList<SimpleGooglePlace>();
             try {
                 places = util.networkCall(getPlacesRequestURL());
             } catch (Exception e) {
@@ -220,62 +203,37 @@ public class NearMe extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<SimpleGooglePlace> googlePlaces) {
 
+            mClusterManager = new ClusterManager<SimpleGooglePlace>(getApplication(), googleMap);
+            boundsBuilder = new LatLngBounds.Builder();
+
             for (SimpleGooglePlace place : googlePlaces) {
 
                 LatLng pos = new LatLng(place.getLatitude(), place.getLongitude());
                 String rating = String.valueOf(place.getRating());
 
+                boundsBuilder.include(pos);
+
+
+
                 markers.add(pos);
                 googleMap.addMarker(new MarkerOptions().position(pos).title(place.getName()).snippet(rating));
 
+                SimpleGooglePlace offsetItem = new SimpleGooglePlace(place.getLatitude(), place.getLongitude());
+                mClusterManager.addItem(offsetItem);
 
-                ClusterMarkerLocation markerLocation = new ClusterMarkerLocation(pos.latitude, pos.longitude);
-                clusterManager.addItem(markerLocation);
-
-                boolean success = db.insertPlace(place.getLatitude(),place.getLongitude(),place.getName(),place.getPhotoRef(),place.getRating(), place.getOpenNow(), place.getWeekdayText(), place.getTypes());
-                Log.d("INSER", String.valueOf(success));
+                //boolean success = db.insertPlaceToFavs(place.getLatitude(),place.getLongitude(),place.getName(),place.getPhotoRef(),place.getRating(), place.getOpenNow(), place.getWeekdayText(), place.getTypes());
+                //Log.d("INSER", String.valueOf(success));
 
             }
+
+            bounds = boundsBuilder.build();
+
+            googleMap.setOnCameraIdleListener(mClusterManager);
+            googleMap.setOnMarkerClickListener(mClusterManager);
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(NearMe.bounds,150), null);
 
             progress.dismiss();
 
-        }
-    }
-
-    private class Markers extends AsyncTask<Double, Integer, List<SimpleGooglePlace>> {
-
-
-        @Override
-        protected List<SimpleGooglePlace> doInBackground(Double... params) {
-            //call which will return list of google places that are near a lat and long
-
-            GooglePlacesUtility util = new GooglePlacesUtility();
-            List<SimpleGooglePlace> places = new ArrayList<SimpleGooglePlace>();
-            try {
-                places = util.networkCall(getPlacesRequestURL());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return places;
-        }
-
-        @Override
-        protected void onPostExecute(List<SimpleGooglePlace> googlePlaces) {
-
-            for (SimpleGooglePlace place : googlePlaces) {
-
-                LatLng pos = new LatLng(place.getLatitude(), place.getLongitude());
-                String rating = String.valueOf(place.getRating());
-
-                markers.add(pos);
-                googleMap.addMarker(new MarkerOptions().position(pos).title(place.getName()).snippet(rating));
-
-
-                ClusterMarkerLocation markerLocation = new ClusterMarkerLocation(pos.latitude, pos.longitude);
-                clusterManager.addItem(markerLocation);
-
-            }
         }
     }
 
@@ -296,20 +254,18 @@ public class NearMe extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
-            refresh();
+            //refresh();
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    void refresh(){
+    void refresh() {
         try {
             db.refreshPlacesTable();
-        }finally {
-            databaseSetup();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-
     }
 
 }

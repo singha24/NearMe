@@ -1,20 +1,18 @@
 package assasingh.nearmev2.Adaptors;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.util.List;
+import java.util.ArrayList;
 
 import assasingh.nearmev2.Model.SimpleGooglePlace;
 import assasingh.nearmev2.R;
@@ -24,7 +22,7 @@ import assasingh.nearmev2.View.NearMe;
  * Created by Assa on 08/03/2017.
  */
 
-public class NearMeListResultAdaptor extends CursorAdapter {
+public class NearMeListResultAdapter extends ArrayAdapter<SimpleGooglePlace> {
 
     ImageView iv;
     double lat;
@@ -35,62 +33,90 @@ public class NearMeListResultAdaptor extends CursorAdapter {
     int distance;
     boolean open;
     String n;
-    String r;
     String photoRef;
 
+    private boolean mNotifyOnChange = true;
 
-    public NearMeListResultAdaptor(Context context, Cursor c) {
-        super(context, c, 0);
+    Context context;
+    ArrayList<SimpleGooglePlace> places;
+    private LayoutInflater mInflater;
+
+
+    public NearMeListResultAdapter(Context context, ArrayList<SimpleGooglePlace> places) {
+        super(context, 0, places);
+        this.context = context;
+        this.places = places;
+        this.mInflater = LayoutInflater.from(context);
+        notifyDataSetChanged();
+
     }
 
-    @Override
-    public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-        return LayoutInflater.from(context).inflate(R.layout.nearme_list_row, viewGroup, false);
-    }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
+    public View getView(int position, View view, ViewGroup parent) {
+
+        int type = getItemViewType(position);
+
+        if (view == null) {
+            view = mInflater.inflate(R.layout.nearme_list_row, parent, false);
+
+        }
+
+        SimpleGooglePlace place = getItem(position);
+
+        view = LayoutInflater.from(getContext()).inflate(R.layout.nearme_list_row, parent, false);
+
 
         iv = (ImageView) view.findViewById(R.id.placeImage);
         name = (TextView) view.findViewById(R.id.name);
         distanceFromUser = (TextView) view.findViewById(R.id.distance);
         rating = (TextView) view.findViewById(R.id.rating);
 
-        while(cursor.moveToNext()) {
+        name.setText(place.getName());
 
-            n = cursor.getString(cursor.getColumnIndexOrThrow("name"));
-            String o = cursor.getString(cursor.getColumnIndexOrThrow("open_now"));
-            r = cursor.getString(cursor.getColumnIndexOrThrow("rating"));
-            photoRef = cursor.getString(cursor.getColumnIndexOrThrow("photo_ref"));
 
-            lat = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow("lat")));
-            lng = Double.parseDouble(cursor.getString(cursor.getColumnIndexOrThrow("lng")));
+        String o = place.getOpenNow();
 
-            double userLat = ((NearMe) context).getLatitude();
-            double userLng = ((NearMe) context).getLongitude();
+        photoRef = place.getPhotoRef();
 
-            distance = (int) distance(lat, lng, userLat, userLng, 'M');
+        lat = place.getLatitude();
+        lng = place.getLongitude();
 
-            open = Boolean.valueOf(o);
+        double userLat = ((NearMe) getContext()).getLatitude();
+        double userLng = ((NearMe) getContext()).getLongitude();
 
-            name.setText(n);
+        distance = (int) distance(lat, lng, userLat, userLng, 'M');
 
-            if (!open) {
-                //distanceFromUser.setVisibility(View.GONE);
-            }
-            distanceFromUser.setText(String.valueOf(distance) + " meters away!");
+        open = Boolean.valueOf(o);
 
-            rating.setText(r + " stars");
+        if (!open) {
+            //distanceFromUser.setVisibility(View.GONE);
         }
+        distanceFromUser.setText(String.valueOf(distance) + " meters away!");
+
+        rating.setText(place.getRating() + " stars");
 
 
         GetImageFromUrl get = new GetImageFromUrl();
 
-        String url = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + photoRef + "&key=" + context.getResources().getString(R.string.places_key);
+        String url = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + photoRef + "&key=" + getContext().getResources().getString(R.string.places_key);
+
+        notifyDataSetChanged();
 
         //get.execute(url);
+        return view;
 
+    }
 
+    @Override
+    public int getItemViewType(int position) {
+        return 1;
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+        mNotifyOnChange = true;
     }
 
     public double getLatLocation() {
@@ -115,6 +141,27 @@ public class NearMeListResultAdaptor extends CursorAdapter {
             dist = dist * 1609.34; //miles to meters
         }
         return (dist);
+    }
+
+    @Override
+    public int getCount() {
+        return places.size();
+    }
+
+    @Override
+    public SimpleGooglePlace getItem(int position) {
+        return places.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        // TODO Auto-generated method stub
+        return position;
+    }
+
+    @Override
+    public int getPosition(SimpleGooglePlace item) {
+        return places.indexOf(item);
     }
 
     /*:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::*/

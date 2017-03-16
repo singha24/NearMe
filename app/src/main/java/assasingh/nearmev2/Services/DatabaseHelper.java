@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * Created by Assa on 08/03/2017.
@@ -13,7 +14,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "Places.db";
-    private static final String PLACES_TABLE = "place_table";
+    private static final String FAV_PLACES_TABLE = "loved";
     private static final String LAT_LNG_TABLE = "lat_lng_table";
 
     private static final String LATLNG_ID = "_id";
@@ -29,6 +30,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String OPEN_NOW = "open_now";
     private static final String WEEKDAY_TEXT = "weekday_text";
     private static final String TYPE = "type";
+    private static final String DATE = "date";
 
     private static int VERSION = 1;
 
@@ -44,20 +46,21 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table " + PLACES_TABLE + " ( " + PLACES_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + LAT + "," + LNG + ", " + NAME + ", " + PHOTO_REF + "," + RATING + ", " + OPEN_NOW + ", " + WEEKDAY_TEXT + ","+ TYPE + ")");
+        db.execSQL("create table " + FAV_PLACES_TABLE + " ( " + PLACES_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + LAT + "," + LNG + ", " + NAME + ", " + PHOTO_REF + "," + RATING + ", " +
+                OPEN_NOW + ", " + WEEKDAY_TEXT + "," + TYPE + "," + DATE + ")");
         db.execSQL("create table " + LAT_LNG_TABLE + "( " + LATLNG_ID + "," + LATLNG_LAT + "," + LATLNG_LNG + ")");
 
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
-        db.execSQL("drop table if exists" + PLACES_TABLE);
+        db.execSQL("drop table if exists" + FAV_PLACES_TABLE);
         db.execSQL("drop table if exists" + LAT_LNG_TABLE);
         onCreate(db);
 
     }
 
-    public boolean insertLatLng(Double lat, Double lng){
+    public boolean insertLatLng(Double lat, Double lng) {
 
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -74,14 +77,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
-    public Cursor getLastKnownLocation(){
+    public Cursor getLastKnownLocation() {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor c = db.rawQuery("SELECT  * FROM " + LAT_LNG_TABLE + " ORDER BY "+ LATLNG_ID +" DESC LIMIT 1", null); //get last inserted record
+        Cursor c = db.rawQuery("SELECT  * FROM " + LAT_LNG_TABLE + " ORDER BY " + LATLNG_ID + " DESC LIMIT 1", null); //get last inserted record
         return c;
     }
 
-    public boolean insertPlace(Double lat, Double lng, String name, String photo_ref, Double rating, String open, String weekdayText, String type) {
+    public boolean removeFromFavs(long id){
         SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(FAV_PLACES_TABLE, PLACES_ID + " = " + id, null) > 0;
+    }
+
+
+    public int insertPlaceToFavs(Double lat, Double lng, String name, String photo_ref, Double rating, String open, String weekdayText, String type, String date) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        long result;
         ContentValues cv = new ContentValues();
 
         cv.put(LAT, lat);
@@ -92,36 +103,41 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(OPEN_NOW, open);
         cv.put(WEEKDAY_TEXT, weekdayText);
         cv.put(TYPE, type);
+        cv.put(DATE, date);
 
-        long result = db.insert(PLACES_TABLE, null, cv);
+        result = db.insert(FAV_PLACES_TABLE, null, cv);
+
 
         if (result == -1)
-            return false;
+            return 1;
         else
-            return true;
+            return 0;
 
     }
 
-    public Cursor getAllFromPlacesTable() {
+    public Cursor getAllFromFavPlacesTable() {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor c = db.rawQuery("SELECT  * FROM " + PLACES_TABLE + " where rating <> 0.0", null);
+        Cursor c = db.rawQuery("SELECT * FROM " + FAV_PLACES_TABLE, null);
+        if (c != null) {
+            c.moveToFirst();
+        }
         return c;
     }
 
-    public Cursor getAllFromPlacesWhereID(long id){
+    public Cursor getAllFromFavPlacesWhereID(long id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor c = db.rawQuery("SELECT  * FROM " + PLACES_TABLE + " where _id = " + id, null);
+        Cursor c = db.rawQuery("SELECT  * FROM " + FAV_PLACES_TABLE + " where _id = " + id, null);
         return c;
     }
 
-    public Cursor getImages(){
+    public Cursor getImages() {
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor c = db.rawQuery("SELECT photo_ref, name FROM " + PLACES_TABLE + " where rating > 4.0", null);
+        Cursor c = db.rawQuery("SELECT photo_ref, name FROM " + FAV_PLACES_TABLE + " where rating > 4.0", null);
         return c;
     }
 
-    public void refreshPlacesTable(){
+    public void refreshPlacesTable() {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("delete from "+ PLACES_TABLE);
+        db.execSQL("delete from " + FAV_PLACES_TABLE);
     }
 }

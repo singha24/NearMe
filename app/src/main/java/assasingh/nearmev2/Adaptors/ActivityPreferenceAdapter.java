@@ -16,12 +16,12 @@ import assasingh.nearmev2.R;
  * Created by Assa on 27/02/2017.
  */
 
-public class ActivityPreferenceAdaptor extends ArrayAdapter<ActivityPreference> {
+public class ActivityPreferenceAdapter extends ArrayAdapter<ActivityPreference> {
 
     private Activity myContext;
 
 
-    public ActivityPreferenceAdaptor(Activity context, int textViewResourceId, ActivityPreference[] objects) {
+    public ActivityPreferenceAdapter(Activity context, int textViewResourceId, ActivityPreference[] objects) {
         super(context, textViewResourceId, objects);
         myContext = context;
     }

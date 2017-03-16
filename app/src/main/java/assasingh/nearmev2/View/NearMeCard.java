@@ -1,18 +1,13 @@
 package assasingh.nearmev2.View;
 
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Vibrator;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -20,10 +15,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.io.InputStream;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import assasingh.nearmev2.R;
 import assasingh.nearmev2.Services.DatabaseHelper;
@@ -31,7 +26,7 @@ import assasingh.nearmev2.Services.DatabaseHelper;
 public class NearMeCard extends AppCompatActivity {
 
     private ImageView placeImage;
-    private ImageView love;
+    private Button love;
     ImageView beenHereBefore;
 
     TextView openNow;
@@ -43,9 +38,24 @@ public class NearMeCard extends AppCompatActivity {
     TextView name;
     Button addToDayPlan;
 
+    String sOpenNow;
+    String sDescription;
+    String sTypes;
+    String sCall;
+    String sShare;
+    String sWebsite;
+    String sName;
+    Double sRating;
+    String photoRef;
+    Double lat;
+    Double lng;
+
     ProgressBar progressBar;
 
     Cursor cursor;
+
+    int id;
+    DatabaseHelper db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,11 +75,9 @@ public class NearMeCard extends AppCompatActivity {
             }
         });*/
 
-        long id = getIntent().getLongExtra("id", 0);
+        id = (int) getIntent().getLongExtra("id", 0);
 
-        DatabaseHelper db = new DatabaseHelper(this);
-
-        cursor = db.getAllFromPlacesWhereID(id);
+         db = new DatabaseHelper(this);
 
 
         openNow = (TextView) findViewById(R.id.open_now);
@@ -79,7 +87,7 @@ public class NearMeCard extends AppCompatActivity {
         share = (ImageView) findViewById(R.id.sharePlace);
         website = (ImageView) findViewById(R.id.website);
         name = (TextView) findViewById(R.id.name);
-        love = (ImageView) findViewById(R.id.heart);
+        love = (Button) findViewById(R.id.heart);
         placeImage = (ImageView) findViewById(R.id.near_me_card_image);
         progressBar = (ProgressBar) findViewById(R.id.progress);
         beenHereBefore = (ImageView) findViewById(R.id.done);
@@ -87,47 +95,47 @@ public class NearMeCard extends AppCompatActivity {
 
         addToDayPlan.setBackgroundColor(Color.parseColor("#b2bcbc"));
 
+        sOpenNow = NearMe.places.get(id).getOpenNow();
+        sDescription = NearMe.places.get(id).getWeekdayText();
+        sRating = NearMe.places.get(id).getRating();
+        sName = NearMe.places.get(id).getName();
+        sTypes = NearMe.places.get(id).getTypes();
+        photoRef = NearMe.places.get(id).getPhotoRef();
+        lat = NearMe.places.get(id).getLatitude();
+        lng = NearMe.places.get(id).getLongitude();
 
-        String photoRef = "";
 
-        if (cursor.getCount() != 0) {
 
-            while (cursor.moveToNext()) {
+        boolean s = Boolean.valueOf(sOpenNow);
 
-                boolean s = Boolean.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("open_now")));
+        if (s)
+            openNow.setText("Open");
+        else
+            openNow.setText(sDescription);
 
-                if (s)
-                    openNow.setText("Open");
-                else
-                    openNow.setText(":( look's like they're closed Jim");
+        description.setText(sRating + " stars (this is meant to be the description)");
 
-                description.setText(cursor.getString(cursor.getColumnIndexOrThrow("rating")) + " stars (this is meant to be the description)");
-
-                name.setText(cursor.getString(cursor.getColumnIndexOrThrow("name")));
-                String cursorString = cursor.getString(cursor.getColumnIndexOrThrow("type"));
-                String outputText = "";
-                String[] cursorSplitString = cursorString.split("\\+");
-                for (int i = 0; i < cursorSplitString.length; i++) {
-                    outputText += cursorSplitString[i] + "\n";
-                }
-
-                outputText = outputText.replace("point_of_interest", "POI");
-                outputText = outputText.trim();
-
-                photoRef = cursor.getString(cursor.getColumnIndexOrThrow("photo_ref"));
-
-                types.setText("\n" + outputText);
-            }
-
-        } else {
-            Toast.makeText(this, "nope", Toast.LENGTH_LONG).show();
+        name.setText(sName);
+        String cursorString = sTypes;
+        String outputText = "";
+        String[] cursorSplitString = cursorString.split("\\+");
+        for (int i = 0; i < cursorSplitString.length; i++) {
+            outputText += cursorSplitString[i] + "\n";
         }
+
+        outputText = outputText.replace("point_of_interest", "POI");
+        outputText = outputText.trim();
+
+
+
+        types.setText("\n" + outputText);
+
 
         GetImageFromUrl get = new GetImageFromUrl();
 
         String url = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + photoRef + "&key=" + getResources().getString(R.string.places_key);
 
-        get.execute(url);
+        //get.execute(url);
 
         placeImage.setVisibility(View.INVISIBLE);
         progressBar.setVisibility(View.VISIBLE);
@@ -135,15 +143,38 @@ public class NearMeCard extends AppCompatActivity {
         love.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                vibrate();
+
+                /*
+                Error codes for insertion
+                0 = no error
+                1 = error with insertion
+                2 = duplicate value
+                 */
+                int success = db.insertPlaceToFavs(lat,lng, sName, photoRef, sRating,
+                        sOpenNow,sDescription, sTypes, getDate());
+
+                Toast.makeText(getApplication(), String.valueOf(success),Toast.LENGTH_LONG).show();
             }
         });
 
 
-
     }
 
-    public void vibrate(){
+    public static String getDate(){
+        try {
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String currentDateTime = dateFormat.format(new Date()); // Find todays date
+
+            return currentDateTime;
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return null;
+        }
+    }
+
+    public void vibrate() {
         Vibrator v = (Vibrator) this.getSystemService(Context.VIBRATOR_SERVICE);
         // Vibrate for 500 milliseconds
         v.vibrate(50);
@@ -166,9 +197,9 @@ public class NearMeCard extends AppCompatActivity {
         @Override
         protected void onPostExecute(Drawable d) {
 
-            if(d != null) {
+            if (d != null) {
                 placeImage.setImageDrawable(d);
-            }else{
+            } else {
                 placeImage.setImageResource(R.drawable.no_image);
             }
             placeImage.setVisibility(View.VISIBLE);

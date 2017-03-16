@@ -1,12 +1,17 @@
 package assasingh.nearmev2.Adaptors;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 
 import assasingh.nearmev2.Model.FavouritePlace;
@@ -26,10 +31,13 @@ public class FavouriteListAdapter extends BaseAdapter {
         return listData.size();
     }
 
+
     @Override
     public Object getItem(int position) {
         return listData.get(position);
     }
+
+
 
     @Override
     public long getItemId(int position) {
@@ -42,7 +50,7 @@ public class FavouriteListAdapter extends BaseAdapter {
             convertView = layoutInflater.inflate(R.layout.favourite_places_row, null);
             holder = new ViewHolder();
             holder.title = (TextView) convertView.findViewById(R.id.title);
-            //holder.image = (ImageView) convertView.findViewById(R.id.favImage);
+            holder.image = (ImageView) convertView.findViewById(R.id.favPlaceImage);
             holder.date = (TextView) convertView.findViewById(R.id.date);
             convertView.setTag(holder);
         } else {
@@ -50,13 +58,17 @@ public class FavouriteListAdapter extends BaseAdapter {
         }
 
         holder.title.setText(listData.get(position).getTitle());
-        holder.date.setText(listData.get(position).getTime());
+        holder.date.setText(listData.get(position).getDate());
+
         return convertView;
     }
 
     static class ViewHolder {
         TextView title;
-        TextView image;
+        static ImageView image;
         TextView date;
     }
+
+
+
 }
