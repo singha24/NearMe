@@ -120,7 +120,8 @@ public class FavouritePlaces extends AppCompatActivity {
                 bundle.putString("name", picked.getTitle());
                 bundle.putParcelable("latlng", picked.getLatLng());
                 bundle.putInt("posInList", position);
-
+                bundle.putString("photoRef", picked.getPhotoRef());
+                bundle.putString("rating", picked.getRating());
                 favFrag.setArguments(bundle);
 
                 favFrag.show(fm,"Alert");

@@ -37,6 +37,7 @@ public class FavouriteAlertFragment extends DialogFragment {
     private LatLng pos;
     private int posInList;
     private String photoRef;
+    public String rating;
 
 
     public FavouriteAlertFragment() {
@@ -56,6 +57,9 @@ public class FavouriteAlertFragment extends DialogFragment {
             name = getArguments().getString("name");
             pos = getArguments().getParcelable("latlng");
             posInList = getArguments().getInt("posInList");
+            photoRef = getArguments().getString("photoRef");
+            rating = getArguments().getString("rating");
+
 
         } catch (NullPointerException e) {
             Log.e("NullPointer", e.toString());
@@ -105,7 +109,14 @@ public class FavouriteAlertFragment extends DialogFragment {
     }
 
     public void createPostCardIntent() {
+        Bundle bundle = new Bundle();
+
+        bundle.putString("name", name);
+        bundle.putString("rating", rating);
+        bundle.putString("photoRef", photoRef);
+
         Intent intent = new Intent(getActivity(), PostCard.class);
+        intent.putExtras(bundle);
         startActivity(intent);
     }
 

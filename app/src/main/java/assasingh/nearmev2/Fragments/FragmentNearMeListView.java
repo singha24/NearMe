@@ -1,6 +1,7 @@
 package assasingh.nearmev2.Fragments;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import assasingh.nearmev2.Adaptors.NearMeListResultAdapter;
 import assasingh.nearmev2.Model.SimpleGooglePlace;
 import assasingh.nearmev2.R;
 import assasingh.nearmev2.View.NearMe;
+import assasingh.nearmev2.View.NearMeCard;
 
 public class FragmentNearMeListView extends Fragment {
 
@@ -34,8 +37,8 @@ public class FragmentNearMeListView extends Fragment {
     public static FragmentNearMeListView newInstance(int page, String title) {
         FragmentNearMeListView listViewFrag = new FragmentNearMeListView();
         Bundle args = new Bundle();
-        args.putInt("someInt", page);
-        args.putString("someTitle", title);
+        args.putInt("int", page);
+        args.putString("title", title);
         listViewFrag.setArguments(args);
         return listViewFrag;
     }
@@ -60,17 +63,24 @@ public class FragmentNearMeListView extends Fragment {
 
 
 
-         adap = new NearMeListResultAdapter(getContext(), (ArrayList<SimpleGooglePlace>) places);
+
+        adap = new NearMeListResultAdapter(getContext(), (ArrayList<SimpleGooglePlace>) places);
 
         list.setAdapter(adap);
 
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Toast.makeText(getContext(), String.valueOf(l), Toast.LENGTH_LONG).show();
+                //Toast.makeText(getContext(), places.get((int) l).getName(), Toast.LENGTH_LONG).show();
+
+                Intent intent = new Intent(getActivity(), NearMeCard.class);
+                intent.putExtra("id", l);
+                startActivity(intent);
 
             }
         });
+
+        adap.notifyDataSetChanged();
 
 
         return v;

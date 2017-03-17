@@ -13,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.maps.model.LatLng;
 
 public class LocationService extends Service implements android.location.LocationListener {
 
@@ -26,6 +27,8 @@ public class LocationService extends Service implements android.location.Locatio
     private static Location location;
     LocationListener[] mLocationListeners;
     private boolean isNetworkEnabled = false;
+
+    private LatLng latLng;
 
     DatabaseHelper dbh = new DatabaseHelper(this);
 
@@ -52,9 +55,21 @@ public class LocationService extends Service implements android.location.Locatio
         setLatitude(location.getLatitude());
         setLongitude(location.getLongitude());
 
+        latLng = new LatLng(location.getLatitude(), location.getLongitude());
+
         Log.e(TAG, "onLocationChanged: " + location);
         Log.e(TAG, "lat:" + String.valueOf(location.getLatitude()) + " lon: " + String.valueOf(location.getLongitude()));
-        this.location.set(location);
+        if(this.location != null) {
+            this.location.set(location);
+        }
+    }
+
+    public LatLng getLatLng() {
+        return latLng;
+    }
+
+    public void setLatLng(LatLng latLng) {
+        this.latLng = latLng;
     }
 
     @Override

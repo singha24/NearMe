@@ -80,6 +80,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public Cursor getLastKnownLocation() {
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor c = db.rawQuery("SELECT  * FROM " + LAT_LNG_TABLE + " ORDER BY " + LATLNG_ID + " DESC LIMIT 1", null); //get last inserted record
+        if (c != null) {
+            c.moveToFirst();
+        }
         return c;
     }
 

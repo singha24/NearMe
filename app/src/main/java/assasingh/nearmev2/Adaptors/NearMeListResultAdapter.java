@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.io.InputStream;
@@ -34,6 +35,8 @@ public class NearMeListResultAdapter extends ArrayAdapter<SimpleGooglePlace> {
     boolean open;
     String n;
     String photoRef;
+
+    ProgressBar progressBar;
 
     private boolean mNotifyOnChange = true;
 
@@ -72,6 +75,10 @@ public class NearMeListResultAdapter extends ArrayAdapter<SimpleGooglePlace> {
         distanceFromUser = (TextView) view.findViewById(R.id.distance);
         rating = (TextView) view.findViewById(R.id.rating);
 
+        progressBar = (ProgressBar) view.findViewById(R.id.listImageProgress);
+
+
+
         name.setText(place.getName());
 
 
@@ -96,14 +103,16 @@ public class NearMeListResultAdapter extends ArrayAdapter<SimpleGooglePlace> {
 
         rating.setText(place.getRating() + " stars");
 
+        iv.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
 
-        GetImageFromUrl get = new GetImageFromUrl();
+        GetImageFromUrl getImageFromUrl = new GetImageFromUrl();
 
         String url = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + photoRef + "&key=" + getContext().getResources().getString(R.string.places_key);
 
         notifyDataSetChanged();
 
-        //get.execute(url);
+        getImageFromUrl.execute(url);
         return view;
 
     }
@@ -196,7 +205,12 @@ public class NearMeListResultAdapter extends ArrayAdapter<SimpleGooglePlace> {
         @Override
         protected void onPostExecute(Drawable d) {
 
-            iv.setImageDrawable(d);
+            iv.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+
+            if(d != null) {
+                iv.setImageDrawable(d);
+            }
 
         }
 

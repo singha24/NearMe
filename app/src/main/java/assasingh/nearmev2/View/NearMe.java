@@ -16,6 +16,8 @@ import android.view.MenuItem;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -45,7 +47,6 @@ public class NearMe extends AppCompatActivity {
     public static String placesRequest;
 
     public static GoogleMap googleMap;
-    public static ArrayList<LatLng> markers;
 
     MyPagerAdapter adapterViewPager;
 
@@ -55,7 +56,7 @@ public class NearMe extends AppCompatActivity {
 
 
     public static DatabaseHelper db;
-    private ClusterManager<SimpleGooglePlace> mClusterManager;
+    public static ClusterManager<SimpleGooglePlace> mClusterManager;
     LatLngBounds.Builder boundsBuilder;
 
     public static LatLngBounds bounds;
@@ -77,7 +78,7 @@ public class NearMe extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         latitude = b.getDouble("lat");
         longitude = b.getDouble("lon");
-        radius = 100;
+        radius = 10;
         activity = "fun";
 
         LatLng ll = new LatLng(latitude, longitude);
@@ -100,17 +101,10 @@ public class NearMe extends AppCompatActivity {
             editor.commit();
         }*/
 
-        adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
-
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
-        viewPager.setAdapter(adapterViewPager);
-
-        tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
-
 
         NearMeAsync nearMeAsync = new NearMeAsync();
         nearMeAsync.execute(); //new thread
+
 
         progress = ProgressDialog.show(this, "Hold on tight!",
                 "Doing some very technical stuff in the background right now..", true);
@@ -176,96 +170,102 @@ public class NearMe extends AppCompatActivity {
         // Returns the page title for the top indicator
         @Override
         public CharSequence getPageTitle(int position) {
-            return "Page " + position;
+            switch (position) {
+                case 0: //List results
+                    //myDrawable = getResources().getDrawable(R.drawable.ic_place_white_24dp);
+                    return "Places on a list!";
+                case 1: //map results
+                    //myDrawable = getResources().getDrawable(R.drawable.img_section2);
+                    return "Places on a map!";
+                default:
+                    break;
+            }
+
+            return "Something went wrong :S";
         }
-
-
     }
 
-    private class NearMeAsync extends AsyncTask<Double, Integer, List<SimpleGooglePlace>> {
+        private class NearMeAsync extends AsyncTask<Double, Integer, List<SimpleGooglePlace>> {
+
+
+            @Override
+            protected List<SimpleGooglePlace> doInBackground(Double... params) {
+                //call which will return list of google places that are near a lat and long
+
+                GooglePlacesUtility util = new GooglePlacesUtility();
+                places = new ArrayList<SimpleGooglePlace>();
+                try {
+                    places = util.networkCall(getPlacesRequestURL());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                return places;
+            }
+
+            @Override
+            protected void onPostExecute(List<SimpleGooglePlace> googlePlaces) {
+
+                mClusterManager = new ClusterManager<SimpleGooglePlace>(getApplication(), googleMap);
+                boundsBuilder = new LatLngBounds.Builder();
+
+                places = googlePlaces;
+
+                for (SimpleGooglePlace place : googlePlaces) {
+
+                    LatLng pos = new LatLng(place.getLatitude(), place.getLongitude());
+                    String rating = String.valueOf(place.getRating());
+
+                    boundsBuilder.include(pos);
+
+                    //googleMap.addMarker(new MarkerOptions().position(pos).title(place.getName()).snippet(rating));
+
+                    SimpleGooglePlace offsetItem = new SimpleGooglePlace(place.getLatitude(), place.getLongitude());
+                    mClusterManager.addItem(offsetItem);
+
+                }
+
+                bounds = boundsBuilder.build();
+
+                if (googleMap != null) {
+                    googleMap.setOnCameraIdleListener(mClusterManager);
+                    googleMap.setOnMarkerClickListener(mClusterManager);
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(NearMe.bounds, 150), null);
+                }
+
+                adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
+
+                viewPager = (ViewPager) findViewById(R.id.viewpager);
+                viewPager.setAdapter(adapterViewPager);
+
+                tabLayout = (TabLayout) findViewById(R.id.tabs);
+                tabLayout.setupWithViewPager(viewPager);
+
+                adapterViewPager.notifyDataSetChanged();
+
+
+                progress.dismiss();
+
+            }
+        }
 
 
         @Override
-        protected List<SimpleGooglePlace> doInBackground(Double... params) {
-            //call which will return list of google places that are near a lat and long
-
-            GooglePlacesUtility util = new GooglePlacesUtility();
-            places = new ArrayList<SimpleGooglePlace>();
-            try {
-                places = util.networkCall(getPlacesRequestURL());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return places;
+        public boolean onCreateOptionsMenu(Menu menu) {
+            // Inflate the menu; this adds items to the action bar if it is present.
+            getMenuInflater().inflate(R.menu.nearme_menu, menu);
+            return true;
         }
 
         @Override
-        protected void onPostExecute(List<SimpleGooglePlace> googlePlaces) {
-
-            mClusterManager = new ClusterManager<SimpleGooglePlace>(getApplication(), googleMap);
-            boundsBuilder = new LatLngBounds.Builder();
-
-            for (SimpleGooglePlace place : googlePlaces) {
-
-                LatLng pos = new LatLng(place.getLatitude(), place.getLongitude());
-                String rating = String.valueOf(place.getRating());
-
-                boundsBuilder.include(pos);
+        public boolean onOptionsItemSelected(MenuItem item) {
+            // Handle action bar item clicks here. The action bar will
+            // automatically handle clicks on the Home/Up button, so long
+            // as you specify a parent activity in AndroidManifest.xml.
+            int id = item.getItemId();
 
 
-
-                markers.add(pos);
-                googleMap.addMarker(new MarkerOptions().position(pos).title(place.getName()).snippet(rating));
-
-                SimpleGooglePlace offsetItem = new SimpleGooglePlace(place.getLatitude(), place.getLongitude());
-                mClusterManager.addItem(offsetItem);
-
-                //boolean success = db.insertPlaceToFavs(place.getLatitude(),place.getLongitude(),place.getName(),place.getPhotoRef(),place.getRating(), place.getOpenNow(), place.getWeekdayText(), place.getTypes());
-                //Log.d("INSER", String.valueOf(success));
-
-            }
-
-            bounds = boundsBuilder.build();
-
-            googleMap.setOnCameraIdleListener(mClusterManager);
-            googleMap.setOnMarkerClickListener(mClusterManager);
-            googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(NearMe.bounds,150), null);
-
-            progress.dismiss();
-
-        }
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.nearme_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_refresh) {
-            //refresh();
+            return super.onOptionsItemSelected(item);
         }
 
-        return super.onOptionsItemSelected(item);
     }
-
-    void refresh() {
-        try {
-            db.refreshPlacesTable();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-}

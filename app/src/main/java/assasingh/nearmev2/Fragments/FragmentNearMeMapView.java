@@ -51,6 +51,7 @@ public class FragmentNearMeMapView extends Fragment {
     private final String TAG = "MAP_DEBUG";
     private String placesRequest;
     LatLngBounds bounds;
+    List<SimpleGooglePlace> googlePlaces;
 
 
 
@@ -79,9 +80,8 @@ public class FragmentNearMeMapView extends Fragment {
         mapView = (MapView) v.findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
 
-        NearMe.markers = new ArrayList<>();
 
-        List<SimpleGooglePlace> googlePlaces = NearMe.getPlaces();
+        googlePlaces = NearMe.getPlaces();
 
 
         mapView.onResume(); // needed to get the map to display immediately
@@ -130,6 +130,12 @@ public class FragmentNearMeMapView extends Fragment {
                         startActivity(intent);
                     }
                 });
+
+                for(SimpleGooglePlace place: googlePlaces){
+                    LatLng pos = new LatLng(place.getLatitude(), place.getLongitude());
+                    NearMe.googleMap.addMarker(new MarkerOptions().position(pos).title(place.getName()).snippet(String.valueOf(place.getRating())));
+                }
+
 
 
 
@@ -192,6 +198,8 @@ public class FragmentNearMeMapView extends Fragment {
     public void onResume() {
         super.onResume();
         mapView.onResume();
+
+
     }
 
     @Override
@@ -215,6 +223,47 @@ public class FragmentNearMeMapView extends Fragment {
     @Override
     public void onViewCreated(View v, Bundle savedInstanceState) {
 
+
+
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (hidden) {
+            Log.d(TAG, ((Object) this).getClass().getSimpleName() + " is NOT on screen");
+        }
+        else
+        {
+            Log.d(TAG, ((Object) this).getClass().getSimpleName() + " is on screen");
+        }
+
+
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            //NearMe.googleMap.setOnCameraIdleListener(NearMe.mClusterManager);
+
+            /*final CameraPosition[] mPreviousCameraPosition = {null};
+            NearMe.googleMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+                @Override
+                public void onCameraIdle() {
+                    CameraPosition position = NearMe.googleMap.getCameraPosition();
+                    if(mPreviousCameraPosition[0] == null || mPreviousCameraPosition[0].zoom != position.zoom) {
+                        mPreviousCameraPosition[0] = NearMe.googleMap.getCameraPosition();
+                        NearMe.mClusterManager.cluster();
+                    }
+                }
+            });*/
+
+            NearMe.googleMap.setOnMarkerClickListener(NearMe.mClusterManager);
+            NearMe.googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(NearMe.bounds, 150), null);
+        } else {
+            // Do your Work
+        }
     }
 
 }

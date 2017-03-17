@@ -10,7 +10,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -25,6 +29,9 @@ public class PostCard extends AppCompatActivity {
 
 
     private Button share;
+    ImageView photo;
+    TextView name;
+    TextView rating;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,24 +39,44 @@ public class PostCard extends AppCompatActivity {
         setContentView(R.layout.activity_post_card);
 
         share = (Button) findViewById(R.id.sharePostCard);
+        photo = (ImageView) findViewById(R.id.image);
+        name = (TextView) findViewById(R.id.name);
+        rating = (TextView) findViewById(R.id.rating);
+
+        Intent intent = getParentActivityIntent();
+
+        Bundle i = intent.getExtras();
+
+        String n = i.getString("name");
+        String r = i.getString("rating");
+
+
+        name.setText(n);
+        rating.setText(r);
 
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                shareImage(store(getScreenShot(getRootView()),getDateTime() + " PostCard_NearMe.png"));
+                shareImage(store(getScreenShot(getRootView()), getDateTime() + " PostCard_NearMe.png"));
 
             }
         });
     }
 
-    public View getRootView(){
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+    }
+
+    public View getRootView() {
         final View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
 
         return rootView;
     }
 
-    public String getDateTime(){
+    public String getDateTime() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
         String currentDateandTime = sdf.format(new Date());
         return currentDateandTime;
@@ -63,10 +90,10 @@ public class PostCard extends AppCompatActivity {
         return bitmap;
     }
 
-    public static File store(Bitmap bm, String fileName){
+    public static File store(Bitmap bm, String fileName) {
         final String dirPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Screenshots";
         File dir = new File(dirPath);
-        if(!dir.exists())
+        if (!dir.exists())
             dir.mkdirs();
         File file = new File(dirPath, fileName);
         try {
@@ -81,7 +108,7 @@ public class PostCard extends AppCompatActivity {
         return file;
     }
 
-    private void shareImage(File file){
+    private void shareImage(File file) {
         Uri uri = Uri.fromFile(file);
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);

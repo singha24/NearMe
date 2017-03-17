@@ -20,6 +20,7 @@ import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewPager;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -185,6 +186,8 @@ public class MainActivity extends AppCompatActivity
             Cursor res = db.getLastKnownLocation();
             double lat = Double.parseDouble(res.getString(res.getColumnIndexOrThrow("lat")));
             double lng = Double.parseDouble(res.getString(res.getColumnIndexOrThrow("lng")));
+
+            Log.d("USINGLASTKNOWN", "lat: " + lat + " : " + lng);
 
             Intent intent = new Intent(this, NearMe.class);
             intent.putExtra("lat", lat);

@@ -65,8 +65,9 @@ public class FavouriteListAdapter extends BaseAdapter {
 
     static class ViewHolder {
         TextView title;
-        static ImageView image;
+        ImageView image;
         TextView date;
+
     }
 
 

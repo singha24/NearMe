@@ -18,6 +18,7 @@ public class FavouritePlace {
     private long id;
     private LatLng pos;
 
+
     public LatLng getLatLng(){
         return pos;
     }

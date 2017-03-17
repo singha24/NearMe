@@ -135,7 +135,7 @@ public class NearMeCard extends AppCompatActivity {
 
         String url = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + photoRef + "&key=" + getResources().getString(R.string.places_key);
 
-        //get.execute(url);
+        get.execute(url);
 
         placeImage.setVisibility(View.INVISIBLE);
         progressBar.setVisibility(View.VISIBLE);
