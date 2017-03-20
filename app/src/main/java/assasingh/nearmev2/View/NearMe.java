@@ -33,6 +33,7 @@ import assasingh.nearmev2.Model.GooglePlacesUtility;
 import assasingh.nearmev2.Model.SimpleGooglePlace;
 import assasingh.nearmev2.R;
 import assasingh.nearmev2.Services.DatabaseHelper;
+import assasingh.nearmev2.Services.NetworkChecker;
 
 public class NearMe extends AppCompatActivity {
 
@@ -49,15 +50,17 @@ public class NearMe extends AppCompatActivity {
     public static GoogleMap googleMap;
 
     MyPagerAdapter adapterViewPager;
+    String query;
 
     ProgressDialog progress;
+    volatile String progressText;
 
     static List<SimpleGooglePlace> places;
 
 
     public static DatabaseHelper db;
+
     public static ClusterManager<SimpleGooglePlace> mClusterManager;
-    LatLngBounds.Builder boundsBuilder;
 
     public static LatLngBounds bounds;
 
@@ -72,24 +75,38 @@ public class NearMe extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
         db = new DatabaseHelper(this);
 
         Bundle b = getIntent().getExtras();
         latitude = b.getDouble("lat");
         longitude = b.getDouble("lon");
+        if (b.getString("query") != null) {
+            query = b.getString("query");
+            query = query.replace("something", "");
+            query.trim();
+            query = query.replaceAll("\\s+", "+");
+
+        }
         radius = 10;
         activity = "fun";
 
         LatLng ll = new LatLng(latitude, longitude);
 
         String type = URLEncoder.encode(getActivity());
-        placesRequest = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
-                latitude + "," + longitude + "&radius=" + radius + "&key=" + getResources().getString(R.string.places_key);
+
+
+        if (query != "") {
+            placesRequest =
+                    "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + query + "&location=" + latitude + "," + longitude + "&radius=" + radius + "&key=" +
+                            getResources().getString(R.string.places_key);
+        }else{
+            placesRequest = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
+                    latitude + "," + longitude + "&radius=" + radius + "&key=" + getResources().getString(R.string.places_key);
+        }
 
         Log.d("URL_REQ", placesRequest);
 
-        setTitle(activity + " : " + convertRadiusToMiles(radius));
+        setTitle(activity + " : " + convertRadiusToMiles(radius) + latitude + ": " + longitude);
 
         /*SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         if (!prefs.getBoolean("firstTime", false)) {
@@ -105,9 +122,10 @@ public class NearMe extends AppCompatActivity {
         NearMeAsync nearMeAsync = new NearMeAsync();
         nearMeAsync.execute(); //new thread
 
+        progressText = "Entering the void";
 
         progress = ProgressDialog.show(this, "Hold on tight!",
-                "Doing some very technical stuff in the background right now..", true);
+                progressText, true);
 
     }
 
@@ -185,87 +203,100 @@ public class NearMe extends AppCompatActivity {
         }
     }
 
-        private class NearMeAsync extends AsyncTask<Double, Integer, List<SimpleGooglePlace>> {
-
-
-            @Override
-            protected List<SimpleGooglePlace> doInBackground(Double... params) {
-                //call which will return list of google places that are near a lat and long
-
-                GooglePlacesUtility util = new GooglePlacesUtility();
-                places = new ArrayList<SimpleGooglePlace>();
-                try {
-                    places = util.networkCall(getPlacesRequestURL());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                return places;
-            }
-
-            @Override
-            protected void onPostExecute(List<SimpleGooglePlace> googlePlaces) {
-
-                mClusterManager = new ClusterManager<SimpleGooglePlace>(getApplication(), googleMap);
-                boundsBuilder = new LatLngBounds.Builder();
-
-                places = googlePlaces;
-
-                for (SimpleGooglePlace place : googlePlaces) {
-
-                    LatLng pos = new LatLng(place.getLatitude(), place.getLongitude());
-                    String rating = String.valueOf(place.getRating());
-
-                    boundsBuilder.include(pos);
-
-                    //googleMap.addMarker(new MarkerOptions().position(pos).title(place.getName()).snippet(rating));
-
-                    SimpleGooglePlace offsetItem = new SimpleGooglePlace(place.getLatitude(), place.getLongitude());
-                    mClusterManager.addItem(offsetItem);
-
-                }
-
-                bounds = boundsBuilder.build();
-
-                if (googleMap != null) {
-                    googleMap.setOnCameraIdleListener(mClusterManager);
-                    googleMap.setOnMarkerClickListener(mClusterManager);
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(NearMe.bounds, 150), null);
-                }
-
-                adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
-
-                viewPager = (ViewPager) findViewById(R.id.viewpager);
-                viewPager.setAdapter(adapterViewPager);
-
-                tabLayout = (TabLayout) findViewById(R.id.tabs);
-                tabLayout.setupWithViewPager(viewPager);
-
-                adapterViewPager.notifyDataSetChanged();
-
-
-                progress.dismiss();
-
-            }
-        }
+    private class NearMeAsync extends AsyncTask<Double, Integer, List<SimpleGooglePlace>> {
 
 
         @Override
-        public boolean onCreateOptionsMenu(Menu menu) {
-            // Inflate the menu; this adds items to the action bar if it is present.
-            getMenuInflater().inflate(R.menu.nearme_menu, menu);
-            return true;
+        protected List<SimpleGooglePlace> doInBackground(Double... params) {
+            //call which will return list of google places that are near a lat and long
+
+            GooglePlacesUtility util = new GooglePlacesUtility(getApplicationContext());
+            places = new ArrayList<SimpleGooglePlace>();
+            try {
+                places = util.networkCall(getPlacesRequestURL());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return places;
         }
 
         @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            // Handle action bar item clicks here. The action bar will
-            // automatically handle clicks on the Home/Up button, so long
-            // as you specify a parent activity in AndroidManifest.xml.
-            int id = item.getItemId();
+        protected void onPostExecute(List<SimpleGooglePlace> googlePlaces) {
 
+            mClusterManager = new ClusterManager<SimpleGooglePlace>(getApplication(), googleMap);
+            progress.setMessage("Creating the cluster manager");
 
-            return super.onOptionsItemSelected(item);
+            places = googlePlaces;
+
+            progress.setMessage("places = googlePlaces");
+
+            int counter = 0;
+
+            progress.setMessage("int counter = 0;");
+
+            for (SimpleGooglePlace place : googlePlaces) {
+
+                LatLng pos = new LatLng(place.getLatitude(), place.getLongitude());
+                String rating = String.valueOf(place.getRating());
+
+                counter++;
+                if (bounds == null) {
+                    bounds = new LatLngBounds(pos, pos);
+                } else {
+                    bounds = bounds.including(pos);
+                }
+
+                //googleMap.addMarker(new MarkerOptions().position(pos).title(place.getName()).snippet(rating));
+
+                SimpleGooglePlace offsetItem = new SimpleGooglePlace(place.getLatitude(), place.getLongitude());
+                mClusterManager.addItem(offsetItem);
+                progress.setMessage("There are " + counter + " places around you!");
+
+            }
+
+            if (googleMap != null) {
+                googleMap.setOnCameraIdleListener(mClusterManager);
+                googleMap.setOnMarkerClickListener(mClusterManager);
+                googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150), null);
+            }
+
+            progress.setMessage("nearly there, phew");
+
+            adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
+
+            viewPager = (ViewPager) findViewById(R.id.viewpager);
+            viewPager.setAdapter(adapterViewPager);
+
+            tabLayout = (TabLayout) findViewById(R.id.tabs);
+            tabLayout.setupWithViewPager(viewPager);
+
+            adapterViewPager.notifyDataSetChanged();
+
+            progress.setMessage("All done (☞ﾟ∀ﾟ)☞");
+
+            progress.dismiss();
+
         }
-
     }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.nearme_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+
+        return super.onOptionsItemSelected(item);
+    }
+
+}

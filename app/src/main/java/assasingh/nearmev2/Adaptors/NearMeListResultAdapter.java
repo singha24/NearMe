@@ -206,10 +206,13 @@ public class NearMeListResultAdapter extends ArrayAdapter<SimpleGooglePlace> {
         protected void onPostExecute(Drawable d) {
 
             iv.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
+
 
             if(d != null) {
                 iv.setImageDrawable(d);
+            }else{
+                iv.setImageResource(R.drawable.no_image);
             }
 
         }

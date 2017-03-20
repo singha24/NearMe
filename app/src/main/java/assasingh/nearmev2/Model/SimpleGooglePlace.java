@@ -21,6 +21,16 @@ public class SimpleGooglePlace implements ClusterItem {
     String phone;
     String address;
 
+    String error;
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
     private final LatLng mPosition;
 
     public SimpleGooglePlace(double lat, double lng) {

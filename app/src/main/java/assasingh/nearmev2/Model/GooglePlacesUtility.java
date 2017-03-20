@@ -1,6 +1,9 @@
 package assasingh.nearmev2.Model;
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,10 +20,20 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import assasingh.nearmev2.View.MainActivity;
+
 /**
  * Created by beaumoaj on 12/02/15.
  */
 public class GooglePlacesUtility {
+
+    private Context context;
+
+
+    public GooglePlacesUtility(Context context){
+
+        this.context = context;
+    }
 
     public static String readGooglePlaces(String uri, String referer) {
         HttpURLConnection conn = null;
@@ -89,89 +102,142 @@ public class GooglePlacesUtility {
         JSONObject jsonObject = new JSONObject(jsonData);
         JSONArray jsonArray = jsonObject.getJSONArray("results");
 
+        String jsonStatus = jsonObject.getString("status");
 
-        for (int i = 0; i < jsonArray.length(); i++) {
+        jsonStatus = jsonStatus.trim();
+
+        Log.d("JSONRES", jsonObject.getString("status"));
+
+        SimpleGooglePlace errorPlace = new SimpleGooglePlace(52.500957, -1.9370728); //ERROR PLACE
+
+        if (jsonStatus.equals("INVALID_REQUEST")) {
+            errorPlace.setError("invalid request params");
+
+            result.add(errorPlace);
+            Intent intent = new Intent(context, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("error", "invalid request params");
+            context.startActivity(intent);
+            return result;
+        } else if (jsonStatus.equals("REQUEST_DENIED")) {
+
+            errorPlace.setError("Invalid places kay, please contact the developer");
+
+            result.add(errorPlace);
+
+            Intent intent = new Intent(context, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("error", "Invalid places kay, please contact the developer");
+            context.startActivity(intent);
+            return result;
+        } else if (jsonStatus.equals("OVER_QUERY_LIMIT")) {
+
+            errorPlace.setError("Unfortunately we've run out of requests for one day :(");
+
+            result.add(errorPlace);
+
+            Intent intent = new Intent(context, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("error", "Unfortunately we've run out of requests for one day :(");
+            context.startActivity(intent);
+            return result;
+        } else if (jsonStatus.equals("ZERO_RESULTS")) {
+            errorPlace.setError("Your search didn't seem to return any results, try something else");
+
+            result.add(errorPlace);
+
+            Intent intent = new Intent(context, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra("error", "Your search didn't seem to return any results, try something else");
+            context.startActivity(intent);
+            return result;
+        } else {
 
 
-            double lat = jsonArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lat");
-            double lng = jsonArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lng");
-            String name = jsonArray.getJSONObject(i).getString("name");
-
-            SimpleGooglePlace place = new SimpleGooglePlace(lat, lng);
-
-            String photoRef = "";
-
-            if(jsonArray.getJSONObject(i).has("photos")){
-                photoRef = jsonArray.getJSONObject(i).getJSONArray("photos").getJSONObject(0).getString("photo_reference");
-            }
-
-            String openNow = "false";
-            String exceptionalDates = "";
-            String weekdayText = "";
+            for (int i = 0; i < jsonArray.length(); i++) {
 
 
-            String types = "";
+                double lat = jsonArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lat");
+                double lng = jsonArray.getJSONObject(i).getJSONObject("geometry").getJSONObject("location").getDouble("lng");
+                String name = jsonArray.getJSONObject(i).getString("name");
 
-            if(jsonArray.getJSONObject(i).has("types")){
-                for(int j = 0; j < jsonArray.getJSONObject(i).getJSONArray("types").length(); j++){
-                    types += "+" + jsonArray.getJSONObject(i).getJSONArray("types").getString(j);
+                SimpleGooglePlace place = new SimpleGooglePlace(lat, lng);
+
+                String photoRef = "";
+
+                if (jsonArray.getJSONObject(i).has("photos")) {
+                    photoRef = jsonArray.getJSONObject(i).getJSONArray("photos").getJSONObject(0).getString("photo_reference");
                 }
-                Log.d("UTILITY", types);
-            }
+
+                String openNow = "false";
+                String exceptionalDates = "";
+                String weekdayText = "";
 
 
+                String types = "";
 
-            double rating = 0.0;
-
-            if(jsonArray.getJSONObject(i).has("rating")){
-                rating = jsonArray.getJSONObject(i).getDouble("rating");
-            }
-
-            String placeID = jsonArray.getJSONObject(i).getString("place_id");
-
-            Log.d("PLACE_ID", placeID);
-
-            String extraInfoUrl = "https://maps.googleapis.com/maps/api/place/details/json?placeid="+placeID+"&key=AIzaSyB3Qirj2H1pL_63c7yXcMIMCjcQUinyHS4";
-
-            String res = urlRequest(extraInfoUrl);
-            JSONObject jObject = new JSONObject(res);
-
-            JSONObject obj = jObject.getJSONObject("result");
-
-            String address = obj.getString("formatted_address");
-
-            String phone = "";
-
-            if(obj.has("formatted_phone_number")){
-                phone = obj.getString("formatted_phone_number");
-            }
-
-            if(obj.has("opening_hours")) {
-                openNow = obj.getJSONObject("opening_hours").getString("open_now");
-                exceptionalDates = obj.getJSONObject("opening_hours").getJSONArray("exceptional_date").toString();
-                for(int j = 0; j <= 6; j++) {
-                    weekdayText += obj.getJSONObject("opening_hours").getJSONArray("weekday_text").getString(j) + "+";
+                if (jsonArray.getJSONObject(i).has("types")) {
+                    for (int j = 0; j < jsonArray.getJSONObject(i).getJSONArray("types").length(); j++) {
+                        types += "+" + jsonArray.getJSONObject(i).getJSONArray("types").getString(j);
+                    }
+                    Log.d("UTILITY", types);
                 }
+
+
+                double rating = 0.0;
+
+                if (jsonArray.getJSONObject(i).has("rating")) {
+                    rating = jsonArray.getJSONObject(i).getDouble("rating");
+                }
+
+                String placeID = jsonArray.getJSONObject(i).getString("place_id");
+
+                Log.d("PLACE_ID", placeID);
+
+                String extraInfoUrl = "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + placeID + "&key=AIzaSyB3Qirj2H1pL_63c7yXcMIMCjcQUinyHS4";
+
+                String res = urlRequest(extraInfoUrl);
+                JSONObject jObject = new JSONObject(res);
+
+                JSONObject obj = jObject.getJSONObject("result");
+
+                String address = obj.getString("formatted_address");
+
+                String phone = "";
+
+                if (obj.has("formatted_phone_number")) {
+                    phone = obj.getString("formatted_phone_number");
+                }
+
+                if (obj.has("opening_hours")) {
+                    openNow = obj.getJSONObject("opening_hours").getString("open_now");
+                    if (obj.has("exceptional_date")) {
+                        exceptionalDates = obj.getJSONObject("opening_hours").getJSONArray("exceptional_date").toString();
+                    }
+                    for (int j = 0; j <= 6; j++) {
+                        weekdayText += obj.getJSONObject("opening_hours").getJSONArray("weekday_text").getString(j) + "+";
+                    }
+                }
+
+
+                place.setLatitude(lat);
+                place.setLongitude(lng);
+                place.setName(name);
+                place.setPhotoRef(photoRef);
+                place.setOpenNow(openNow);
+                place.setRating(rating);
+                place.setExceptionalDates(exceptionalDates);
+                place.setWeekdayText(weekdayText);
+                place.setTypes(types);
+                place.setAddress(address);
+                place.setPhone(phone);
+
+                result.add(place);
             }
 
 
-            place.setLatitude(lat);
-            place.setLongitude(lng);
-            place.setName(name);
-            place.setPhotoRef(photoRef);
-            place.setOpenNow(openNow);
-            place.setRating(rating);
-            place.setExceptionalDates(exceptionalDates);
-            place.setWeekdayText(weekdayText);
-            place.setTypes(types);
-            place.setAddress(address);
-            place.setPhone(phone);
-
-            result.add(place);
+            return result;
         }
-
-
-        return result;
     }
 
     private String urlRequest(String s) throws Exception {
