@@ -23,7 +23,6 @@
         android:theme="@style/MyTheme">
         <activity
             android:name=".View.MainActivity"
-            android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
