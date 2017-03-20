@@ -11,7 +11,6 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-
     <permission
         android:name="android.permission.MAPS_RECEIVE"
         android:protectionLevel="signature" />
@@ -49,11 +48,10 @@
                 android:value="assasingh.nearmev2.View.MainActivity" />
         </activity>
         <activity
-            android:configChanges="orientation|screenSize"
-            android:name=".View.NearMe">
+            android:name=".View.NearMe"
+            android:configChanges="orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-
                 android:value="assasingh.nearmev2.View.MainActivity" />
         </activity>
         <activity
@@ -83,12 +81,11 @@
         <activity
             android:name=".View.NearMeCard"
             android:label="@string/title_activity_near_me_card">
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="assasingh.nearmev2.View.NearMe" />
-
         </activity>
+        <activity android:name=".View.Test"></activity>
     </application>
 
 </manifest>

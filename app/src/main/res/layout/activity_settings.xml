@@ -23,15 +23,6 @@
 
 
 
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-
-        android:id="@+id/prefList"/>
-
-
-
 
 
 </android.support.design.widget.CoordinatorLayout>

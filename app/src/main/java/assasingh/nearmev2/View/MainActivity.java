@@ -6,6 +6,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Color;
@@ -14,6 +15,7 @@ import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
@@ -39,6 +41,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -165,7 +168,7 @@ public class MainActivity extends AppCompatActivity
                         favPlacesIntent();
                         break;
                     case 3:
-                        //TODO
+                        settingsIntent();
                         break;
                 }
 
@@ -183,6 +186,16 @@ public class MainActivity extends AppCompatActivity
             Toast.makeText(this,(String) savedInstanceState.getSerializable("error"),Toast.LENGTH_LONG).show();
 
         }
+
+        TextView dev = (TextView) findViewById(R.id.question);
+
+        dev.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(getApplicationContext(), Test.class);
+                startActivity(i);
+            }
+        });
 
 
     }

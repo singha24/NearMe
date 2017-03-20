@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="travelMode">
+        <item>30 miles</item>
+        <item>20 miles</item>
+        <item>10 miles</item>
+        <item>5 miles</item>
+        <item>2 miles</item>
+    </string-array>
+
+    <string-array name="travelModeValues">
+        <item>50000</item>
+        <item>32000</item>
+        <item>16000</item>
+        <item>3218</item>
+
+    </string-array>
+
+    <string-array name="costHuman">
+        <item>Only free stuff please</item>
+        <item>£</item>
+        <item>££</item>
+        <item>£££</item>
+        <item>££££</item>
+    </string-array>
+
+    <string-array name="costValues">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+    </string-array>
+
+    <string-array name="activityHuman">
+        <item>Amusement Parks</item>
+        <item>Aquariums</item>
+        <item>Art Galleries</item>
+        <item>ATM</item>
+        <item>Bank</item>
+        <item>Bar</item>
+        <item>Beauty Salon</item>
+        <item>Cafe</item>
+        <item>Casino</item>
+        <item>Church</item>
+        <item>Gym</item>
+        <item>Hindu Temple</item>
+        <item>Library</item>
+        <item>Mosque</item>
+        <item>Museum</item>
+        <item>Night Club</item>
+        <item>Park</item>
+        <item>Shopping Mall</item>
+        <item>Spa</item>
+        <item>Stadium</item>
+        <item>Zoo</item>
+    </string-array>
+
+    <string-array name="activityValues">
+        <item>amusement_parks</item>
+        <item>aquarium</item>
+        <item>art_galleries</item>
+        <item>atm</item>
+        <item>bank</item>
+        <item>bar</item>
+        <item>beauty Salon</item>
+        <item>cafe</item>
+        <item>casino</item>
+        <item>church</item>
+        <item>gym</item>
+        <item>hindu_temple</item>
+        <item>library</item>
+        <item>mosque</item>
+        <item>museum</item>
+        <item>night_club</item>
+        <item>park</item>
+        <item>shopping_mall</item>
+        <item>spa</item>
+        <item>stadium</item>
+        <item>zoo</item>
+    </string-array>
+    <string-array name="defaultActivity">
+        <item>Cafe</item>
+
+        <item>Zoo</item>
+    </string-array>
+
+
+</resources>

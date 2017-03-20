@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="My commute preferences"
+        android:key="sync_category">
+
+        <CheckBoxPreference
+            android:key="perform_sync"
+            android:summary="Enable or disable data sync"
+            android:title="Enable Auto Sync"
+            android:defaultValue="true" />
+
+        <ListPreference
+            android:key="walk_max"
+            android:title="I am willing to travel a maximum of"
+            android:summary="Define the max number of miles you are willing to travel"
+            android:defaultValue="500"
+            android:entries="@array/travelMode"
+            android:entryValues="@array/travelModeValues" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Money Money Money"
+        android:key="cost_category">
+
+        <ListPreference
+            android:key="cost_max"
+            android:title="I am willing to spend"
+            android:summary="Define how much you are willing to spend"
+            android:defaultValue="500"
+            android:entries="@array/costHuman"
+            android:entryValues="@array/costValues" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Fun, Fashion, Food"
+        android:key="activity_category">
+
+        <MultiSelectListPreference
+            android:dialogTitle="I like..."
+            android:key="activity_types"
+            android:summary="Pick the things you like doing and I'll try to find them!"
+            android:title="I like doing..."
+            android:entries="@array/activityHuman"
+            android:entryValues="@array/activityValues"
+            android:defaultValue="@array/defaultActivity" />
+
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Personal Informations"
+        android:key="personal_category">
+
+
+        <EditTextPreference
+            android:key="full_name"
+            android:title="Name"
+            android:summary="Enter Your Complete Name"
+            android:dialogTitle="Your Name"
+            android:dialogMessage="Enter Your Complete Name"
+            android:defaultValue=""
+            android:inputType="textCapWords" />
+
+        <EditTextPreference
+            android:key="email_address"
+            android:title="Email Address"
+            android:summary="Enter Your Email Address"
+            android:dialogTitle="Enter Your Email Address"
+            android:dialogMessage="Enter Your Email Address"
+            android:defaultValue=""
+            android:inputType="textEmailAddress" />
+
+    </PreferenceCategory>
+
+
+    <PreferenceCategory
+        android:title="Customisations"
+        android:key="custom_category">
+
+
+        <RingtonePreference
+            android:key="notification_ringtone"
+            android:title="Notification Ringtone"
+            android:summary="Customise Notification Ringtone for you"
+            android:dialogTitle="Notification Ringtone"
+            android:dialogMessage="Customise Notification Ringtone for you" />
+
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
