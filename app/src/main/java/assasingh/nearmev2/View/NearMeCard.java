@@ -61,19 +61,6 @@ public class NearMeCard extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_near_me_card);
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
-
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
 
         id = (int) getIntent().getLongExtra("id", 0);
 
@@ -153,6 +140,14 @@ public class NearMeCard extends AppCompatActivity {
                 int success = db.insertPlaceToFavs(lat,lng, sName, photoRef, sRating,
                         sOpenNow,sDescription, sTypes, getDate());
 
+                Toast.makeText(getApplication(), String.valueOf(success), Toast.LENGTH_LONG).show();
+            }
+        });
+
+        addToDayPlan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int success = db.insertIntoDayPlan(lat, lng, sName, photoRef, sDescription);
                 Toast.makeText(getApplication(), String.valueOf(success),Toast.LENGTH_LONG).show();
             }
         });

@@ -1,5 +1,6 @@
 package assasingh.nearmev2.View;
 
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -14,10 +15,23 @@ import android.widget.ListView;
 import java.util.ArrayList;
 
 import assasingh.nearmev2.Adaptors.DayPlanListAdapter;
+import assasingh.nearmev2.Adaptors.FavouriteListAdapter;
 import assasingh.nearmev2.Fragments.FavouriteAlertFragment;
+import assasingh.nearmev2.Model.FavouritePlace;
 import assasingh.nearmev2.R;
+import assasingh.nearmev2.Services.DatabaseHelper;
 
 public class DayPlan extends AppCompatActivity {
+
+    assasingh.nearmev2.Model.DayPlan dayPlan;
+    String name;
+    String photoRef;
+    long id;
+    double lat;
+    double lng;
+    String description;
+
+    public static DayPlanListAdapter adap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,61 +53,70 @@ public class DayPlan extends AppCompatActivity {
         android.support.v7.app.ActionBar bar = getSupportActionBar();
         bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#cc3333")));
 
+        DatabaseHelper db = new DatabaseHelper(this);
 
-        ArrayList image_details = getListData();
+
+        ArrayList<assasingh.nearmev2.Model.DayPlan> dayPlan = new ArrayList<assasingh.nearmev2.Model.DayPlan>();
+
+        Cursor c = db.getAllFromDayPlanTable();
+
+
+        while (c.moveToNext()) {
+            name = c.getString(c.getColumnIndexOrThrow("name"));
+            photoRef = c.getString(c.getColumnIndexOrThrow("photo_ref"));
+            description = c.getString(c.getColumnIndexOrThrow("description"));
+            id = c.getLong(c.getColumnIndexOrThrow("_id"));
+
+            lat = c.getDouble(c.getColumnIndexOrThrow("lat"));
+            lng = c.getDouble(c.getColumnIndexOrThrow("lng"));
+
+
+            this.dayPlan = new assasingh.nearmev2.Model.DayPlan();
+
+            this.dayPlan.setTitle(name);
+            this.dayPlan.setId(id);
+            this.dayPlan.setLatlng(lat, lng);
+            this.dayPlan.setPhotoRef(photoRef);
+
+
+            dayPlan.add(this.dayPlan);
+
+
+        }
+
+        c.close();
+        db.close();
+
         final ListView lv1 = (ListView) findViewById(R.id.dayPlan);
-        lv1.setAdapter(new DayPlanListAdapter(this, image_details));
+
+        adap = new DayPlanListAdapter(this, dayPlan);
+
+        lv1.setAdapter(adap);
 
         lv1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String picked = "you selected " + String.valueOf(parent.getItemAtPosition(position));
+
+                assasingh.nearmev2.Model.DayPlan picked = (assasingh.nearmev2.Model.DayPlan) parent.getItemAtPosition(position);
 
                 final android.app.FragmentManager fm = getFragmentManager();
                 final FavouriteAlertFragment favFrag = new FavouriteAlertFragment();
 
                 Bundle bundle = new Bundle();
-                bundle.putString("selected", picked);
-
+                bundle.putLong("id", picked.getId());
+                bundle.putString("name", picked.getTitle());
+                bundle.putParcelable("latlng", picked.getLatlng());
+                bundle.putInt("posInList", position);
+                bundle.putString("photoRef", picked.getPhotoRef());
+                bundle.putString("description", picked.getDescription());
                 favFrag.setArguments(bundle);
 
                 favFrag.show(fm,"Alert");
+
+
             }
         });
 
-    }
-
-    private ArrayList getListData() {
-        ArrayList<assasingh.nearmev2.Model.DayPlan> results = new ArrayList<assasingh.nearmev2.Model.DayPlan>();
-        assasingh.nearmev2.Model.DayPlan favObj = new assasingh.nearmev2.Model.DayPlan();
-
-        favObj.setTitle("Start location");
-        favObj.setDescription("Restaurant, great food, great atmosphere and great company");
-        favObj.setTime("15:38");
-        results.add(favObj);
-
-        assasingh.nearmev2.Model.DayPlan favObj1 = new assasingh.nearmev2.Model.DayPlan();
-
-        favObj1.setTitle("Boston Tea Party");
-        favObj1.setDescription("Best blend of tea's and coffee's");
-        favObj1.setTime("16:15");
-        results.add(favObj1);
-
-        assasingh.nearmev2.Model.DayPlan favObj2 = new assasingh.nearmev2.Model.DayPlan();
-
-        favObj2.setTitle("Aston Woodcock Sports");
-        favObj2.setDescription("Aston woodcock sports center offers");
-        favObj2.setTime("16:57");
-        results.add(favObj2);
-
-        assasingh.nearmev2.Model.DayPlan obj3 = new assasingh.nearmev2.Model.DayPlan();
-
-        obj3.setTitle("Home");
-        obj3.setTime("18:02");
-        results.add(obj3);
-
-        // Add some more dummy data for testing
-        return results;
     }
 
 }

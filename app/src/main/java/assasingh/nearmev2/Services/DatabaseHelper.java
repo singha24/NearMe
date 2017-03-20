@@ -16,6 +16,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "Places.db";
     private static final String FAV_PLACES_TABLE = "loved";
     private static final String LAT_LNG_TABLE = "lat_lng_table";
+    private static final String DAY_PLAN_TABLE = "dayPlan";
 
     private static final String LATLNG_ID = "_id";
     private static final String LATLNG_LAT = "lat";
@@ -49,6 +50,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("create table " + FAV_PLACES_TABLE + " ( " + PLACES_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + LAT + "," + LNG + ", " + NAME + ", " + PHOTO_REF + "," + RATING + ", " +
                 OPEN_NOW + ", " + WEEKDAY_TEXT + "," + TYPE + "," + DATE + ")");
         db.execSQL("create table " + LAT_LNG_TABLE + "( " + LATLNG_ID + "," + LATLNG_LAT + "," + LATLNG_LNG + ")");
+        db.execSQL("create table " + DAY_PLAN_TABLE + "(" + PLACES_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + NAME + ", " + LAT + ", " + LNG + ", " + PHOTO_REF + ", description)");
 
     }
 
@@ -56,8 +58,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int i, int i1) {
         db.execSQL("drop table if exists" + FAV_PLACES_TABLE);
         db.execSQL("drop table if exists" + LAT_LNG_TABLE);
+        db.execSQL("drop table if exists" + DAY_PLAN_TABLE);
         onCreate(db);
 
+    }
+
+    public int insertIntoDayPlan(Double lat, Double lng, String name, String photo_ref, String description) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        long result;
+        ContentValues cv = new ContentValues();
+
+        cv.put(LAT, lat);
+        cv.put(LNG, lng);
+        cv.put(NAME, name);
+        cv.put(PHOTO_REF, photo_ref);
+        cv.put("description", description);
+
+
+        result = db.insert(DAY_PLAN_TABLE, null, cv);
+
+
+        if (result == -1)
+            return 1;
+        else
+            return 0;
+
+    }
+
+    public boolean removeFromDayPlan(long id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        return db.delete(DAY_PLAN_TABLE, PLACES_ID + " = " + id, null) > 0;
     }
 
     public boolean insertLatLng(Double lat, Double lng) {
@@ -116,6 +147,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         else
             return 0;
 
+    }
+
+    public Cursor getAllFromDayPlanTable() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM " + DAY_PLAN_TABLE, null);
+        if (c != null) {
+            c.moveToFirst();
+        }
+        return c;
     }
 
     public Cursor getAllFromFavPlacesTable() {

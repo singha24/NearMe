@@ -2,6 +2,8 @@ package assasingh.nearmev2.Model;
 
 import android.widget.ImageView;
 
+import com.google.android.gms.maps.model.LatLng;
+
 /**
  * Created by Assa Chana on 23/11/2016.
  */
@@ -10,8 +12,32 @@ public class DayPlan {
 
     private String title;
     private String description;
-    private ImageView image;
+    private String photoRef;
     private String time;
+    private long id;
+    private LatLng latlng;
+
+    public void setLatlng(double lat, double lng) {
+        LatLng ll = new LatLng(lat, lng);
+        this.latlng = ll;
+    }
+
+    public LatLng getLatlng() {
+        return latlng;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public void setPhotoRef(String photoRef) {
+        this.photoRef = photoRef;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -20,8 +46,8 @@ public class DayPlan {
         this.title = title;
     }
 
-    public ImageView getImage() {
-        return image;
+    public String getPhotoRef() {
+        return photoRef;
     }
 
     public String getDescription(){
