@@ -2,19 +2,33 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        android:title="My commute preferences"
-        android:key="sync_category">
+        android:title="Fine Control"
+        android:key="otherParams">
 
         <CheckBoxPreference
-            android:key="perform_sync"
-            android:summary="Enable or disable data sync"
-            android:title="Enable Auto Sync"
-            android:defaultValue="true" />
+            android:key="openNowPref"
+            android:summary="Most places show their current open status but many do not, so use this with a pinch of salt"
+            android:title="Only show open places"
+            android:defaultValue="false" />
+
+        <ListPreference
+            android:key="language_pref"
+            android:title="Language"
+            android:summary="Choose which language you would like the results to be displayed in."
+            android:defaultValue="en"
+            android:entries="@array/languageMode"
+            android:entryValues="@array/languageValues" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="My commute preferences"
+        android:key="sync_category">
 
         <ListPreference
             android:key="walk_max"
             android:title="I am willing to travel a maximum of"
-            android:summary="Define the max number of miles you are willing to travel"
+            android:summary="Fitness freak or exploring a new city? Here's where you can set how far you're willing to travel."
             android:defaultValue="500"
             android:entries="@array/travelMode"
             android:entryValues="@array/travelModeValues" />
@@ -28,7 +42,7 @@
         <ListPreference
             android:key="cost_max"
             android:title="I am willing to spend"
-            android:summary="Define how much you are willing to spend"
+            android:summary="Here you can define how much you are willing to spend."
             android:defaultValue="500"
             android:entries="@array/costHuman"
             android:entryValues="@array/costValues" />
@@ -41,12 +55,12 @@
 
         <MultiSelectListPreference
             android:dialogTitle="I like..."
+            android:defaultValue="@array/defaultActivity"
             android:key="activity_types"
             android:summary="Pick the things you like doing and I'll try to find them!"
-            android:title="I like doing..."
+            android:title="The things I like..."
             android:entries="@array/activityHuman"
-            android:entryValues="@array/activityValues"
-            android:defaultValue="@array/defaultActivity" />
+            android:entryValues="@array/activityValues" />
 
 
     </PreferenceCategory>

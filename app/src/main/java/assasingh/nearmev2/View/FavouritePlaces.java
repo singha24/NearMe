@@ -122,6 +122,7 @@ public class FavouritePlaces extends AppCompatActivity {
                 bundle.putInt("posInList", position);
                 bundle.putString("photoRef", picked.getPhotoRef());
                 bundle.putString("rating", picked.getRating());
+                bundle.putString("favourite", "loved");
                 favFrag.setArguments(bundle);
 
                 favFrag.show(fm,"Alert");

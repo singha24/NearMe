@@ -1,18 +1,25 @@
 package assasingh.nearmev2.View;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -25,7 +32,11 @@ import com.google.maps.android.clustering.ClusterManager;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 import assasingh.nearmev2.Fragments.FragmentNearMeListView;
 import assasingh.nearmev2.Fragments.FragmentNearMeMapView;
@@ -55,7 +66,11 @@ public class NearMe extends AppCompatActivity {
     ProgressDialog progress;
     volatile String progressText;
 
+    boolean openNow = false;
+
     static List<SimpleGooglePlace> places;
+
+    String language = "en"; //english by default
 
 
     public static DatabaseHelper db;
@@ -87,21 +102,61 @@ public class NearMe extends AppCompatActivity {
             query = query.replaceAll("\\s+", "+");
 
         }
-        radius = 10;
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
+        int prefRadius = Integer.valueOf(sharedPrefs.getString("walk_max", "-1"));
+
+        radius = prefRadius;
         activity = "fun";
+
+        int minPrice = Integer.valueOf(sharedPrefs.getString("cost_max", "-1"));
+        int maxPrice = Integer.valueOf(sharedPrefs.getString("cost_max", "-1"));
+        language = sharedPrefs.getString("language_pref", "en");
+
+        openNow = sharedPrefs.getBoolean("openNowPref", false);
 
         LatLng ll = new LatLng(latitude, longitude);
 
         String type = URLEncoder.encode(getActivity());
 
+        Set<String> activitySelections = sharedPrefs.getStringSet("activity_types", null);
 
-        if (query != "") {
-            placesRequest =
-                    "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + query + "&location=" + latitude + "," + longitude + "&radius=" + radius + "&key=" +
-                            getResources().getString(R.string.places_key);
+        String[] act = activitySelections.toArray(new String[activitySelections.size()]);
+
+        String randAct = "";
+
+        if (act.length != 0) {
+
+            int rnd = new Random().nextInt(act.length);
+            randAct = act[rnd];
         }else{
-            placesRequest = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
-                    latitude + "," + longitude + "&radius=" + radius + "&key=" + getResources().getString(R.string.places_key);
+            showPrefAlert();
+            randAct = "cafe";
+        }
+
+        Log.d("RANDOM", randAct);
+        Log.d("RANDOM", activitySelections.toString());
+
+
+        if (!openNow) {
+            if (!query.equals("")) {
+                placesRequest = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + query + "&location=" + latitude + "," + longitude + "&radius=" + radius + "&language=" + language + "&minprice=" + minPrice + "&maxprice=" + maxPrice + "&key=" + getResources().getString(R.string.places_key);
+
+            } else {
+                placesRequest = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
+                        latitude + "," + longitude + "&radius=" + radius + "&language=" + language + "&key=" + getResources().getString(R.string.places_key);
+            }
+        } else {
+            if (!query.equals("")) {
+                placesRequest = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + query + "&location=" + latitude + "," + longitude + "&radius=" + radius + "&minprice=" + minPrice + "&maxprice=" + maxPrice + "&language=" + language + "&opennow&key=" + getResources().getString(R.string.places_key);
+
+            } else {
+                placesRequest = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" +
+                        latitude + "," + longitude + "&radius=" + radius + "&opennow&language=" + language + "&key=" + getResources().getString(R.string.places_key);
+            }
+
         }
 
         Log.d("URL_REQ", placesRequest);
@@ -127,6 +182,27 @@ public class NearMe extends AppCompatActivity {
         progress = ProgressDialog.show(this, "Hold on tight!",
                 progressText, true);
 
+    }
+
+    void showPrefAlert() {
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Are you sure?")
+                .setCancelable(true)
+                .setMessage("Seems like you haven't set any preferences on activity type, would you like to do this now?")
+                .setPositiveButton("Yes please", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("No, proceed with default", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 
     public static String getPlacesRequestURL() {

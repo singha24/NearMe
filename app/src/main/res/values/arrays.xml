@@ -13,8 +13,36 @@
         <item>50000</item>
         <item>32000</item>
         <item>16000</item>
+        <item>8047</item>
         <item>3218</item>
 
+    </string-array>
+
+
+    <string-array name="languageMode">
+        <item>Arabic</item>
+        <item>Bulgarian</item>
+        <item>Bengali</item>
+        <item>Danish</item>
+        <item>German</item>
+        <item>English</item>
+        <item>Spanish</item>
+        <item>French</item>
+        <item>Hindi</item>
+        <item>Japanese</item>
+    </string-array>
+
+    <string-array name="languageValues">
+        <item>ar</item>
+        <item>bg</item>
+        <item>bn</item>
+        <item>da</item>
+        <item>de</item>
+        <item>en</item>
+        <item>es</item>
+        <item>fr</item>
+        <item>hi</item>
+        <item>ja</item>
     </string-array>
 
     <string-array name="costHuman">
@@ -64,7 +92,7 @@
         <item>atm</item>
         <item>bank</item>
         <item>bar</item>
-        <item>beauty Salon</item>
+        <item>beauty_salon</item>
         <item>cafe</item>
         <item>casino</item>
         <item>church</item>
@@ -80,10 +108,10 @@
         <item>stadium</item>
         <item>zoo</item>
     </string-array>
-    <string-array name="defaultActivity">
-        <item>Cafe</item>
 
-        <item>Zoo</item>
+    <string-array name="defaultActivity">
+        <item>cafe</item>
+        <item>zoo</item>
     </string-array>
 
 

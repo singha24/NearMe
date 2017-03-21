@@ -3,14 +3,12 @@ package assasingh.nearmev2.Fragments;
 
 import android.app.DialogFragment;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -18,8 +16,6 @@ import android.widget.Toast;
 import com.google.android.gms.maps.model.LatLng;
 
 import assasingh.nearmev2.Adaptors.FavActionDialogAdapter;
-import assasingh.nearmev2.Adaptors.FavouriteListAdapter;
-import assasingh.nearmev2.Model.FavouritePlace;
 import assasingh.nearmev2.R;
 import assasingh.nearmev2.Services.DatabaseHelper;
 import assasingh.nearmev2.View.PostCard;
@@ -31,13 +27,15 @@ public class FavouriteAlertFragment extends DialogFragment {
 
     private static ListView lv;
     private static Integer[] actionIcons = {R.drawable.postcard, R.drawable.share, R.drawable.cross};
-    private static String[] menu = {"Create Postcard", "Share this place", "Remove from favourites"};
+    private static String[] menu = {"Create Postcard", "Share this place", "Remove from list"};
     private static long placeID;
     private String name;
     private LatLng pos;
     private int posInList;
     private String photoRef;
     public String rating;
+    public String favtable;
+    public String dayPlanTable;
 
 
     public FavouriteAlertFragment() {
@@ -59,7 +57,8 @@ public class FavouriteAlertFragment extends DialogFragment {
             posInList = getArguments().getInt("posInList");
             photoRef = getArguments().getString("photoRef");
             rating = getArguments().getString("rating");
-
+            favtable = getArguments().getString("favourite");
+            dayPlanTable = getArguments().getString("dayPlan");
 
         } catch (NullPointerException e) {
             Log.e("NullPointer", e.toString());
@@ -89,7 +88,7 @@ public class FavouriteAlertFragment extends DialogFragment {
                         break;
                     case 2:
 
-                        boolean success = deleteFromFavourites(placeID);
+                        boolean success = deleteFromTable(placeID, getTable());
 
                         Toast.makeText(getActivity(), placeID + " : " + String.valueOf(success), Toast.LENGTH_SHORT).show();
 
@@ -103,9 +102,25 @@ public class FavouriteAlertFragment extends DialogFragment {
         return rootView;
     }
 
-    public boolean deleteFromFavourites(long id){
+    public String getFavtable() {
+        return favtable;
+    }
+
+    public String getDayPlanTable() {
+        return dayPlanTable;
+    }
+
+    public String getTable() {
+        if (getDayPlanTable() == null) {
+            return getFavtable();
+        } else {
+            return getDayPlanTable();
+        }
+    }
+
+    public boolean deleteFromTable(long id, String tableName) {
         DatabaseHelper db = new DatabaseHelper(getActivity());
-        return db.removeFromFavs(id);
+        return db.removeFromTable(id, tableName);
     }
 
     public void createPostCardIntent() {

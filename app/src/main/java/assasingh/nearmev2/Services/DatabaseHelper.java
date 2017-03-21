@@ -117,9 +117,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return c;
     }
 
-    public boolean removeFromFavs(long id){
+    public boolean removeFromTable(long id, String table) {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete(FAV_PLACES_TABLE, PLACES_ID + " = " + id, null) > 0;
+        return db.delete(table, PLACES_ID + " = " + id, null) > 0;
     }
 
 

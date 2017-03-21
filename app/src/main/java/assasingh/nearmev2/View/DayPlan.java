@@ -109,6 +109,7 @@ public class DayPlan extends AppCompatActivity {
                 bundle.putInt("posInList", position);
                 bundle.putString("photoRef", picked.getPhotoRef());
                 bundle.putString("description", picked.getDescription());
+                bundle.putString("dayPlan", "dayPlan");
                 favFrag.setArguments(bundle);
 
                 favFrag.show(fm,"Alert");

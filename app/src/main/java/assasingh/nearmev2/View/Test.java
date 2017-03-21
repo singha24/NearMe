@@ -19,6 +19,7 @@ public class Test extends AppCompatActivity {
         setContentView(R.layout.activity_test);
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         Set<String> activitySelections = sharedPrefs.getStringSet("activity_types", null);
 
@@ -28,11 +29,12 @@ public class Test extends AppCompatActivity {
 
         StringBuilder builder = new StringBuilder();
 
-        builder.append("\n" + "Perform Sync:\t" + sharedPrefs.getBoolean("perform_sync", false));
+        builder.append("\n" + "opne now:\t" + sharedPrefs.getBoolean("openNowPref", false));
         builder.append("\n" + "Max walk:\t" + sharedPrefs.getString("walk_max", "-1"));
         builder.append("\n" + "cost:\t" + sharedPrefs.getString("cost_max", "-1"));
         builder.append("\n" + "Activity Pref:\t" + sharedPrefs.getStringSet("activity_types", activitySelections));
         builder.append("\n" + "Customized Notification Ringtone:\t" + sharedPrefs.getString("notification_ringtone", ""));
+        builder.append("\n" + "language:\t" + sharedPrefs.getString("language_pref", "en"));
 
         TextView settingsTextView = (TextView) findViewById(R.id.settingsContent);
         settingsTextView.setText(builder.toString());

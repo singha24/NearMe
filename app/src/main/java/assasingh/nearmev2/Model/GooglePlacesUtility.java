@@ -180,7 +180,7 @@ public class GooglePlacesUtility {
                     for (int j = 0; j < jsonArray.getJSONObject(i).getJSONArray("types").length(); j++) {
                         types += "+" + jsonArray.getJSONObject(i).getJSONArray("types").getString(j);
                     }
-                    Log.d("UTILITY", types);
+                    //Log.d("UTILITY", types);
                 }
 
 
@@ -192,7 +192,7 @@ public class GooglePlacesUtility {
 
                 String placeID = jsonArray.getJSONObject(i).getString("place_id");
 
-                Log.d("PLACE_ID", placeID);
+                //Log.d("PLACE_ID", placeID);
 
                 String extraInfoUrl = "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + placeID + "&key=AIzaSyB3Qirj2H1pL_63c7yXcMIMCjcQUinyHS4";
 
