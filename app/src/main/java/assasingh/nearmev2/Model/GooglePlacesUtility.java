@@ -30,7 +30,7 @@ public class GooglePlacesUtility {
     private Context context;
 
 
-    public GooglePlacesUtility(Context context){
+    public GooglePlacesUtility(Context context) {
 
         this.context = context;
     }
@@ -111,44 +111,38 @@ public class GooglePlacesUtility {
         SimpleGooglePlace errorPlace = new SimpleGooglePlace(52.500957, -1.9370728); //ERROR PLACE
 
         if (jsonStatus.equals("INVALID_REQUEST")) {
-            errorPlace.setError("invalid request params");
 
-            result.add(errorPlace);
+            MainActivity.ERROR = "invalid request params";
+
             Intent intent = new Intent(context, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra("error", "invalid request params");
             context.startActivity(intent);
             return result;
         } else if (jsonStatus.equals("REQUEST_DENIED")) {
 
-            errorPlace.setError("Invalid places kay, please contact the developer");
 
-            result.add(errorPlace);
+            MainActivity.ERROR = "Invalid places kay, please contact the developer";
+
 
             Intent intent = new Intent(context, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra("error", "Invalid places kay, please contact the developer");
             context.startActivity(intent);
             return result;
         } else if (jsonStatus.equals("OVER_QUERY_LIMIT")) {
 
-            errorPlace.setError("Unfortunately we've run out of requests for one day :(");
+            MainActivity.ERROR = "Unfortunately we've run out of requests for one day :(";
 
-            result.add(errorPlace);
 
             Intent intent = new Intent(context, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra("error", "Unfortunately we've run out of requests for one day :(");
             context.startActivity(intent);
             return result;
         } else if (jsonStatus.equals("ZERO_RESULTS")) {
-            errorPlace.setError("Your search didn't seem to return any results, try something else");
 
-            result.add(errorPlace);
+            MainActivity.ERROR = "Your search didn't seem to return any results, try something else";
 
             Intent intent = new Intent(context, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra("error", "Your search didn't seem to return any results, try something else");
             context.startActivity(intent);
             return result;
         } else {

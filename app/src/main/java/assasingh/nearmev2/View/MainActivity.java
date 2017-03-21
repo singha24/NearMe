@@ -80,6 +80,8 @@ public class MainActivity extends AppCompatActivity
     public static NetworkChecker networkChecker;
     private ConnectivityManager cm;
 
+    public static volatile String ERROR = "";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -431,7 +433,10 @@ public class MainActivity extends AppCompatActivity
     protected void onStart() {
         super.onStart();
         startService(new Intent(this, LocationService.class));
-
+        if (!ERROR.equals("")) {
+            Toast.makeText(this, ERROR, Toast.LENGTH_LONG).show();
+            ERROR = "";
+        }
         enableGPS();
     }
 

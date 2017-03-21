@@ -290,8 +290,12 @@ public class NearMe extends AppCompatActivity {
             places = new ArrayList<SimpleGooglePlace>();
             try {
                 places = util.networkCall(getPlacesRequestURL());
+                if (places.get(0).getName().equals("error")) {
+                    finish();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
+                finish();
             }
 
             return places;
