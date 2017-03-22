@@ -102,7 +102,7 @@ public class FavouritePlaces extends AppCompatActivity {
         GetImageFromUrl get = new GetImageFromUrl();
         String url = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + photoRef + "&key=AIzaSyB3Qirj2H1pL_63c7yXcMIMCjcQUinyHS4";
 
-        //get.execute(url);
+        get.execute(url);
 
 
 

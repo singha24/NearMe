@@ -79,7 +79,8 @@ public class FavouriteAlertFragment extends DialogFragment {
 
                 switch (position) {
                     case 0:
-                        createPostCardIntent();
+                        Log.d("FAVALERT", name + rating + photoRef);
+                        createPostCardIntent(name, rating, photoRef);
                         break;
                     case 1:
 
@@ -123,15 +124,11 @@ public class FavouriteAlertFragment extends DialogFragment {
         return db.removeFromTable(id, tableName);
     }
 
-    public void createPostCardIntent() {
-        Bundle bundle = new Bundle();
-
-        bundle.putString("name", name);
-        bundle.putString("rating", rating);
-        bundle.putString("photoRef", photoRef);
-
+    public void createPostCardIntent(String name, String rating, String photoRef) {
         Intent intent = new Intent(getActivity(), PostCard.class);
-        intent.putExtras(bundle);
+        intent.putExtra("name", name);
+        intent.putExtra("rating", rating);
+        intent.putExtra("photoRef", photoRef);
         startActivity(intent);
     }
 
