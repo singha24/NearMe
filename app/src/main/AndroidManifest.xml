@@ -84,7 +84,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="assasingh.nearmev2.View.NearMe" />
         </activity>
-        <activity android:name=".View.Test"></activity>
+        <activity android:name=".View.Test" />
+        <activity android:name=".View.DayPlanMap"></activity>
     </application>
 
 </manifest>

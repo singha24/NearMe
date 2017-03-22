@@ -35,6 +35,7 @@ public class Test extends AppCompatActivity {
         builder.append("\n" + "Activity Pref:\t" + sharedPrefs.getStringSet("activity_types", activitySelections));
         builder.append("\n" + "Customized Notification Ringtone:\t" + sharedPrefs.getString("notification_ringtone", ""));
         builder.append("\n" + "language:\t" + sharedPrefs.getString("language_pref", "en"));
+        builder.append("\n" + "travel method:\t" + sharedPrefs.getString("travel_mode", "walking"));
 
         TextView settingsTextView = (TextView) findViewById(R.id.settingsContent);
         settingsTextView.setText(builder.toString());

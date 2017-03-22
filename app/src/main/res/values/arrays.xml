@@ -61,6 +61,20 @@
         <item>4</item>
     </string-array>
 
+    <string-array name="travelMethod">
+        <item>Driving</item>
+        <item>Walking</item>
+        <item>Cycling</item>
+        <item>Public Transport</item>
+    </string-array>
+
+    <string-array name="travelValues">
+        <item>driving</item>
+        <item>walking</item>
+        <item>bicycling</item>
+        <item>transit</item>
+    </string-array>
+
     <string-array name="activityHuman">
         <item>Amusement Parks</item>
         <item>Aquariums</item>

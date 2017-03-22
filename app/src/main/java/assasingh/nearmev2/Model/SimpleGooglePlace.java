@@ -31,7 +31,7 @@ public class SimpleGooglePlace implements ClusterItem {
         this.error = error;
     }
 
-    private final LatLng mPosition;
+    private LatLng mPosition;
 
     public SimpleGooglePlace(double lat, double lng) {
         mPosition = new LatLng(lat,lng);

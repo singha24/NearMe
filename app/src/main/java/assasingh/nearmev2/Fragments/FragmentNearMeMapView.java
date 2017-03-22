@@ -4,6 +4,7 @@ package assasingh.nearmev2.Fragments;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -22,6 +23,8 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -41,6 +44,8 @@ import assasingh.nearmev2.Services.DatabaseHelper;
 import assasingh.nearmev2.View.NearMe;
 import assasingh.nearmev2.View.NearMeCard;
 
+import static assasingh.nearmev2.View.NearMe.circle;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -52,7 +57,8 @@ public class FragmentNearMeMapView extends Fragment {
     private String placesRequest;
     LatLngBounds bounds;
     List<SimpleGooglePlace> googlePlaces;
-
+    private ClusterManager<SimpleGooglePlace> mClusterManager;
+    private GoogleMap googleMap;
 
 
     public FragmentNearMeMapView() {
@@ -97,30 +103,31 @@ public class FragmentNearMeMapView extends Fragment {
         //NearMe.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.5009146, -1.9371191), 100));
 
 
+        mClusterManager = new ClusterManager<SimpleGooglePlace>(getActivity(), googleMap);
+
+
+        //googleMap.setOnCameraChangeListener(mClusterManager);
 
 
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
-            public void onMapReady(GoogleMap mMap) {
-                NearMe.googleMap = mMap;
+            public void onMapReady(final GoogleMap mMap) {
+                googleMap = mMap;
 
                 // For showing a move to my location button
                 if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                     // TODO: Consider calling
                     return;
                 }
-                NearMe.googleMap.setMyLocationEnabled(true);
-
+                googleMap.setMyLocationEnabled(true);
 
 
 //                /NearMe.googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(ll, 10));
                 //NearMe.googleMap.setOnCameraIdleListener(NearMe.clusterManager);
 
-                NearMe.googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                     @Override
                     public void onInfoWindowClick(Marker marker) {
-
-
 
                         String m = marker.getId().replace("m", "");
                         long pos = Integer.valueOf(m);
@@ -131,20 +138,30 @@ public class FragmentNearMeMapView extends Fragment {
                     }
                 });
 
-                for(SimpleGooglePlace place: googlePlaces){
+
+                for (SimpleGooglePlace place : googlePlaces) {
                     LatLng pos = new LatLng(place.getLatitude(), place.getLongitude());
-                    NearMe.googleMap.addMarker(new MarkerOptions().position(pos).title(place.getName()).snippet(String.valueOf(place.getRating())));
+                    googleMap.addMarker(new MarkerOptions().position(pos).title(place.getName()).snippet(String.valueOf(place.getRating())));
+
+                    mClusterManager.addItem(place);
+
+                    circle = googleMap.addCircle(new CircleOptions()
+                            .center(place.getPosition())
+                            .radius(1000)
+                            .strokeWidth(5)
+                            .strokeColor(Color.BLACK)
+                            .fillColor(Color.parseColor("#FFF859"))
+                            .clickable(true));
+
+                    googleMap.setOnCircleClickListener(new GoogleMap.OnCircleClickListener() {
+                        @Override
+                        public void onCircleClick(Circle circle) {
+
+                            //circle.setFillColor(Color.parseColor("#C740FF"));
+                        }
+                    });
+
                 }
-
-
-
-
-                /*bounds = null;
-                for(int i =0; i< NearMe.markers.size(); i++){
-                    bounds.including(NearMe.markers.get(i));
-                }
-
-                NearMe.googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds,100));*/
 
 
                 // For dropping a marker at a point on the Map
@@ -157,41 +174,6 @@ public class FragmentNearMeMapView extends Fragment {
         return v;
 
 
-    }
-
-    class MyInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
-
-        private final View myContentsView;
-
-        MyInfoWindowAdapter(){
-            myContentsView = getActivity().getLayoutInflater().inflate(R.layout.info_window, null);
-        }
-
-        @Override
-        public View getInfoContents(Marker marker) {
-
-            TextView placeName = ((TextView)myContentsView.findViewById(R.id.infowindow_name));
-            placeName.setText(marker.getTitle());
-            TextView rating = ((TextView)myContentsView.findViewById(R.id.infowindow_rating));
-            rating.setText(marker.getSnippet());
-
-            ImageView icon = ((ImageView)myContentsView.findViewById(R.id.infowindow_icon));
-
-            return myContentsView;
-        }
-
-        @Override
-        public View getInfoWindow(Marker marker) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-    }
-
-
-
-    public String getPlacesRequestURL() {
-        return placesRequest;
     }
 
     @Override
@@ -224,7 +206,6 @@ public class FragmentNearMeMapView extends Fragment {
     public void onViewCreated(View v, Bundle savedInstanceState) {
 
 
-
     }
 
     @Override
@@ -232,9 +213,7 @@ public class FragmentNearMeMapView extends Fragment {
         super.onHiddenChanged(hidden);
         if (hidden) {
             Log.d(TAG, ((Object) this).getClass().getSimpleName() + " is NOT on screen");
-        }
-        else
-        {
+        } else {
             Log.d(TAG, ((Object) this).getClass().getSimpleName() + " is on screen");
         }
 
@@ -245,22 +224,11 @@ public class FragmentNearMeMapView extends Fragment {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
-            //NearMe.googleMap.setOnCameraIdleListener(NearMe.mClusterManager);
 
-            /*final CameraPosition[] mPreviousCameraPosition = {null};
-            NearMe.googleMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
-                @Override
-                public void onCameraIdle() {
-                    CameraPosition position = NearMe.googleMap.getCameraPosition();
-                    if(mPreviousCameraPosition[0] == null || mPreviousCameraPosition[0].zoom != position.zoom) {
-                        mPreviousCameraPosition[0] = NearMe.googleMap.getCameraPosition();
-                        NearMe.mClusterManager.cluster();
-                    }
-                }
-            });*/
+            googleMap.setOnMarkerClickListener(mClusterManager);
+            //googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(NearMe.bounds, 150), null);
 
-            NearMe.googleMap.setOnMarkerClickListener(NearMe.mClusterManager);
-            NearMe.googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(NearMe.bounds, 150), null);
+            googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(NearMe.getLatLng(), 15));
         } else {
             // Do your Work
         }

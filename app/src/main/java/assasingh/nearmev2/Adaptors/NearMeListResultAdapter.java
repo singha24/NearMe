@@ -25,18 +25,15 @@ import assasingh.nearmev2.View.NearMe;
 
 public class NearMeListResultAdapter extends ArrayAdapter<SimpleGooglePlace> {
 
-    ImageView iv;
+
     double lat;
     double lng;
-    TextView name;
-    TextView distanceFromUser;
-    TextView rating;
+
+
     int distance;
     boolean open;
     String n;
-    String photoRef;
 
-    ProgressBar progressBar;
 
     private boolean mNotifyOnChange = true;
 
@@ -69,22 +66,19 @@ public class NearMeListResultAdapter extends ArrayAdapter<SimpleGooglePlace> {
 
         view = LayoutInflater.from(getContext()).inflate(R.layout.nearme_list_row, parent, false);
 
-
-        iv = (ImageView) view.findViewById(R.id.placeImage);
-        name = (TextView) view.findViewById(R.id.name);
-        distanceFromUser = (TextView) view.findViewById(R.id.distance);
-        rating = (TextView) view.findViewById(R.id.rating);
-
-        progressBar = (ProgressBar) view.findViewById(R.id.listImageProgress);
+        PlaceObject placeObj = new PlaceObject(view, place.getPhotoRef());
 
 
+        placeObj.iv = (ImageView) view.findViewById(R.id.placeImage);
+        placeObj.name = (TextView) view.findViewById(R.id.name);
+        placeObj.distanceFromUser = (TextView) view.findViewById(R.id.distance);
+        placeObj.rating = (TextView) view.findViewById(R.id.rating);
 
-        name.setText(place.getName());
+
+        placeObj.name.setText(place.getName());
 
 
         String o = place.getOpenNow();
-
-        photoRef = place.getPhotoRef();
 
         lat = place.getLatitude();
         lng = place.getLongitude();
@@ -96,25 +90,61 @@ public class NearMeListResultAdapter extends ArrayAdapter<SimpleGooglePlace> {
 
         open = Boolean.valueOf(o);
 
-        if (!open) {
-            //distanceFromUser.setVisibility(View.GONE);
-        }
-        distanceFromUser.setText(String.valueOf(distance) + " meters away!");
+        placeObj.distanceFromUser.setText(String.valueOf(distance) + " meters away!");
 
-        rating.setText(place.getRating() + " stars");
-
-        iv.setVisibility(View.INVISIBLE);
-        progressBar.setVisibility(View.VISIBLE);
-
-        GetImageFromUrl getImageFromUrl = new GetImageFromUrl();
-
-        String url = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + photoRef + "&key=" + getContext().getResources().getString(R.string.places_key);
+        placeObj.rating.setText(place.getRating() + " stars");
 
         notifyDataSetChanged();
 
-        getImageFromUrl.execute(url);
         return view;
 
+    }
+
+    static class PlaceObject {
+        ImageView iv;
+        TextView name;
+        TextView distanceFromUser;
+        TextView rating;
+
+
+        String photoRef;
+        View view;
+
+        public PlaceObject(View view, String photoRef) {
+            this.view = view;
+            this.photoRef = photoRef;
+
+            GetImageFromUrl get = new GetImageFromUrl();
+            String url = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=" + this.photoRef + "&key=AIzaSyB3Qirj2H1pL_63c7yXcMIMCjcQUinyHS4";
+
+            get.execute(url);
+        }
+
+        private class GetImageFromUrl extends AsyncTask<String, Void, Drawable> {
+
+            @Override
+            protected Drawable doInBackground(String... params) {
+
+                try {
+                    InputStream is = (InputStream) new URL(params[0]).getContent();
+                    Drawable d = Drawable.createFromStream(is, "src name");
+                    return d;
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+
+            @Override
+            protected void onPostExecute(Drawable d) {
+
+                if (d != null) {
+                    iv.setImageDrawable(d);
+                }
+
+            }
+
+
+        }
     }
 
     @Override
@@ -128,13 +158,6 @@ public class NearMeListResultAdapter extends ArrayAdapter<SimpleGooglePlace> {
         mNotifyOnChange = true;
     }
 
-    public double getLatLocation() {
-        return lat;
-    }
-
-    public double getLngLocation() {
-        return lng;
-    }
 
     private double distance(double lat1, double lon1, double lat2, double lon2, char unit) {
         double theta = lon1 - lon2;
@@ -188,36 +211,6 @@ public class NearMeListResultAdapter extends ArrayAdapter<SimpleGooglePlace> {
     }
 
 
-    private class GetImageFromUrl extends AsyncTask<String, Void, Drawable> {
 
-        @Override
-        protected Drawable doInBackground(String... params) {
-
-            try {
-                InputStream is = (InputStream) new URL(params[0]).getContent();
-                Drawable d = Drawable.createFromStream(is, "src name");
-                return d;
-            } catch (Exception e) {
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Drawable d) {
-
-            iv.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.GONE);
-
-
-            if(d != null) {
-                iv.setImageDrawable(d);
-            }else{
-                iv.setImageResource(R.drawable.no_image);
-            }
-
-        }
-
-
-    }
 
 }

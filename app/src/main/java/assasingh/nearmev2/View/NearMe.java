@@ -17,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -25,6 +26,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -54,11 +57,11 @@ public class NearMe extends AppCompatActivity {
     private ViewPager viewPager;
     private int radius;
     private String activity;
-    private double latitude;
-    private double longitude;
+    private static double latitude;
+    private static double longitude;
     public static String placesRequest;
 
-    public static GoogleMap googleMap;
+
 
     MyPagerAdapter adapterViewPager;
     String query;
@@ -72,10 +75,13 @@ public class NearMe extends AppCompatActivity {
 
     String language = "en"; //english by default
 
+    public static CircleOptions circleOptions;
+    public static Circle circle;
+
 
     public static DatabaseHelper db;
 
-    public static ClusterManager<SimpleGooglePlace> mClusterManager;
+
 
     public static LatLngBounds bounds;
 
@@ -102,14 +108,17 @@ public class NearMe extends AppCompatActivity {
             query = query.replaceAll("\\s+", "+");
 
         }
+        if (b.getString("activity") != null) {
+            activity = b.getString("activity");
+        }
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         int prefRadius = Integer.valueOf(sharedPrefs.getString("walk_max", "-1"));
 
-        radius = prefRadius;
-        activity = "fun";
+        //radius = prefRadius; //TODO Change back
+        radius = 50;
 
         int minPrice = Integer.valueOf(sharedPrefs.getString("cost_max", "-1"));
         int maxPrice = Integer.valueOf(sharedPrefs.getString("cost_max", "-1"));
@@ -119,29 +128,26 @@ public class NearMe extends AppCompatActivity {
 
         LatLng ll = new LatLng(latitude, longitude);
 
-        String type = URLEncoder.encode(getActivity());
-
         Set<String> activitySelections = sharedPrefs.getStringSet("activity_types", null);
 
-        String[] act = activitySelections.toArray(new String[activitySelections.size()]);
+        if (activitySelections != null) {
 
-        String randAct = "";
+            String[] act = activitySelections.toArray(new String[activitySelections.size()]);
 
-        if (act.length != 0) {
+            String randAct = "";
 
-            int rnd = new Random().nextInt(act.length);
-            randAct = act[rnd];
-        }else{
-            showPrefAlert();
-            randAct = "cafe";
+            if (act.length != 0) {
+
+                int rnd = new Random().nextInt(act.length);
+                randAct = act[rnd];
+            } else {
+                randAct = "cafe";
+            }
         }
-
-        Log.d("RANDOM", randAct);
-        Log.d("RANDOM", activitySelections.toString());
 
 
         if (!openNow) {
-            if (!query.equals("")) {
+            if (query != "") {
                 placesRequest = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + query + "&location=" + latitude + "," + longitude + "&radius=" + radius + "&language=" + language + "&minprice=" + minPrice + "&maxprice=" + maxPrice + "&key=" + getResources().getString(R.string.places_key);
 
             } else {
@@ -149,7 +155,7 @@ public class NearMe extends AppCompatActivity {
                         latitude + "," + longitude + "&radius=" + radius + "&language=" + language + "&key=" + getResources().getString(R.string.places_key);
             }
         } else {
-            if (!query.equals("")) {
+            if (query != "") {
                 placesRequest = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=" + query + "&location=" + latitude + "," + longitude + "&radius=" + radius + "&minprice=" + minPrice + "&maxprice=" + maxPrice + "&language=" + language + "&opennow&key=" + getResources().getString(R.string.places_key);
 
             } else {
@@ -181,29 +187,11 @@ public class NearMe extends AppCompatActivity {
 
         progress = ProgressDialog.show(this, "Hold on tight!",
                 progressText, true);
+        progress.getWindow().setGravity(Gravity.BOTTOM);
 
     }
 
-    void showPrefAlert() {
-        new android.app.AlertDialog.Builder(this)
-                .setTitle("Are you sure?")
-                .setCancelable(true)
-                .setMessage("Seems like you haven't set any preferences on activity type, would you like to do this now?")
-                .setPositiveButton("Yes please", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
-                        startActivity(intent);
-                    }
-                })
-                .setNegativeButton("No, proceed with default", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-    }
+
 
     public static String getPlacesRequestURL() {
         return placesRequest;
@@ -217,15 +205,20 @@ public class NearMe extends AppCompatActivity {
         return activity;
     }
 
+    public static LatLng getLatLng() {
+        LatLng ll = new LatLng(getLatitude(), getLongitude());
+        return ll;
+    }
+
     public int getRadius() {
         return radius;
     }
 
-    public double getLongitude() {
+    public static double getLongitude() {
         return longitude;
     }
 
-    public double getLatitude() {
+    public static double getLatitude() {
         return latitude;
     }
 
@@ -304,7 +297,7 @@ public class NearMe extends AppCompatActivity {
         @Override
         protected void onPostExecute(List<SimpleGooglePlace> googlePlaces) {
 
-            mClusterManager = new ClusterManager<SimpleGooglePlace>(getApplication(), googleMap);
+
             progress.setMessage("Creating the cluster manager");
 
             places = googlePlaces;
@@ -314,6 +307,7 @@ public class NearMe extends AppCompatActivity {
             int counter = 0;
 
             progress.setMessage("int counter = 0;");
+
 
             for (SimpleGooglePlace place : googlePlaces) {
 
@@ -329,16 +323,8 @@ public class NearMe extends AppCompatActivity {
 
                 //googleMap.addMarker(new MarkerOptions().position(pos).title(place.getName()).snippet(rating));
 
-                SimpleGooglePlace offsetItem = new SimpleGooglePlace(place.getLatitude(), place.getLongitude());
-                mClusterManager.addItem(offsetItem);
                 progress.setMessage("There are " + counter + " places around you!");
 
-            }
-
-            if (googleMap != null) {
-                googleMap.setOnCameraIdleListener(mClusterManager);
-                googleMap.setOnMarkerClickListener(mClusterManager);
-                googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 150), null);
             }
 
             progress.setMessage("nearly there, phew");

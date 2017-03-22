@@ -46,6 +46,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Set;
 
 import assasingh.nearmev2.Adaptors.TrendingAdapter;
 import assasingh.nearmev2.Fragments.FirstFragment;
@@ -92,6 +93,8 @@ public class MainActivity extends AppCompatActivity
 
         android.support.v7.app.ActionBar bar = getSupportActionBar();
         bar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#3399cc")));
+
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         viewPager = (ViewPager) findViewById(R.id.trending);
 
@@ -213,28 +216,67 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-    public void nearMeIntent(){
-        if(LocationService.locationAvailable()) {
-            Intent intent = new Intent(this, NearMe.class);
-            intent.putExtra("lat", LocationService.getLatitude());
-            intent.putExtra("lon", LocationService.getLongitude());
-            intent.putExtra("query", getTextFromSpeech());
-            startActivity(intent);
+    public boolean isPrefSet() {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        Set<String> activitySelections = sharedPrefs.getStringSet("activity_types", null);
+        if (activitySelections.size() == 0) {
+            showPrefAlert();
+            return false;
         }else{
-            Toast.makeText(this, "Using last known location",Toast.LENGTH_LONG).show();
-            Cursor res = db.getLastKnownLocation();
-            double lat = Double.parseDouble(res.getString(res.getColumnIndexOrThrow("lat")));
-            double lng = Double.parseDouble(res.getString(res.getColumnIndexOrThrow("lng")));
-
-            Log.d("USINGLASTKNOWN", "lat: " + lat + " : " + lng);
-
-            Intent intent = new Intent(this, NearMe.class);
-            intent.putExtra("lat", lat);
-            intent.putExtra("lon", lng);
-            startActivity(intent);
-
-
+            return true;
         }
+    }
+
+    public void nearMeIntent() {
+        if (isPrefSet()) {
+            if (LocationService.locationAvailable()) {
+                Intent intent = new Intent(this, NearMe.class);
+                intent.putExtra("lat", LocationService.getLatitude());
+                intent.putExtra("lon", LocationService.getLongitude());
+                intent.putExtra("query", getTextFromSpeech());
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Using last known location", Toast.LENGTH_LONG).show();
+                Cursor res = db.getLastKnownLocation();
+                double lat = Double.parseDouble(res.getString(res.getColumnIndexOrThrow("lat")));
+                double lng = Double.parseDouble(res.getString(res.getColumnIndexOrThrow("lng")));
+
+                Log.d("USINGLASTKNOWN", "lat: " + lat + " : " + lng);
+
+                Intent intent = new Intent(this, NearMe.class);
+                intent.putExtra("lat", lat);
+                intent.putExtra("lon", lng);
+                startActivity(intent);
+
+
+            }
+        }
+    }
+
+    void showPrefAlert() {
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Are you sure?")
+                .setCancelable(true)
+                .setMessage("Seems like you haven't set any preferences on activity type, would you like to do this now?")
+                .setPositiveButton("Yes please", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                        startActivity(intent);
+                    }
+                })
+                .setNegativeButton("No, proceed with default", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(getApplicationContext(), NearMe.class);
+                        intent.putExtra("lat", LocationService.getLatitude());
+                        intent.putExtra("lon", LocationService.getLongitude());
+                        intent.putExtra("activity", "cafe");
+                        startActivity(intent);
+                    }
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 
     public void settingsIntent(){

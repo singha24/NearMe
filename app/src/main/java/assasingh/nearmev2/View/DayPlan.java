@@ -1,5 +1,6 @@
 package assasingh.nearmev2.View;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -15,15 +16,14 @@ import android.widget.ListView;
 import java.util.ArrayList;
 
 import assasingh.nearmev2.Adaptors.DayPlanListAdapter;
-import assasingh.nearmev2.Adaptors.FavouriteListAdapter;
 import assasingh.nearmev2.Fragments.FavouriteAlertFragment;
-import assasingh.nearmev2.Model.FavouritePlace;
+import assasingh.nearmev2.Model.DayPlanModel;
 import assasingh.nearmev2.R;
 import assasingh.nearmev2.Services.DatabaseHelper;
 
 public class DayPlan extends AppCompatActivity {
 
-    assasingh.nearmev2.Model.DayPlan dayPlan;
+    DayPlanModel dayPlanModel;
     String name;
     String photoRef;
     long id;
@@ -32,6 +32,7 @@ public class DayPlan extends AppCompatActivity {
     String description;
 
     public static DayPlanListAdapter adap;
+    public static ArrayList<DayPlanModel> dayPlan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +42,19 @@ public class DayPlan extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
+        fab.setVisibility(View.INVISIBLE);
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Lets Go!!!", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
+                Intent intent = new Intent(getApplicationContext(), DayPlanMap.class);
+                startActivity(intent);
+
+
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -56,32 +65,36 @@ public class DayPlan extends AppCompatActivity {
         DatabaseHelper db = new DatabaseHelper(this);
 
 
-        ArrayList<assasingh.nearmev2.Model.DayPlan> dayPlan = new ArrayList<assasingh.nearmev2.Model.DayPlan>();
+        dayPlan = new ArrayList<DayPlanModel>();
+
 
         Cursor c = db.getAllFromDayPlanTable();
 
+        try {
+            while (c.moveToNext()) {
+                name = c.getString(c.getColumnIndexOrThrow("name"));
+                photoRef = c.getString(c.getColumnIndexOrThrow("photo_ref"));
+                description = c.getString(c.getColumnIndexOrThrow("description"));
+                id = c.getLong(c.getColumnIndexOrThrow("_id"));
 
-        while (c.moveToNext()) {
-            name = c.getString(c.getColumnIndexOrThrow("name"));
-            photoRef = c.getString(c.getColumnIndexOrThrow("photo_ref"));
-            description = c.getString(c.getColumnIndexOrThrow("description"));
-            id = c.getLong(c.getColumnIndexOrThrow("_id"));
-
-            lat = c.getDouble(c.getColumnIndexOrThrow("lat"));
-            lng = c.getDouble(c.getColumnIndexOrThrow("lng"));
-
-
-            this.dayPlan = new assasingh.nearmev2.Model.DayPlan();
-
-            this.dayPlan.setTitle(name);
-            this.dayPlan.setId(id);
-            this.dayPlan.setLatlng(lat, lng);
-            this.dayPlan.setPhotoRef(photoRef);
+                lat = c.getDouble(c.getColumnIndexOrThrow("lat"));
+                lng = c.getDouble(c.getColumnIndexOrThrow("lng"));
 
 
-            dayPlan.add(this.dayPlan);
+                this.dayPlanModel = new DayPlanModel();
+
+                this.dayPlanModel.setTitle(name);
+                this.dayPlanModel.setId(id);
+                this.dayPlanModel.setLatlng(lat, lng);
+                this.dayPlanModel.setPhotoRef(photoRef);
 
 
+                dayPlan.add(this.dayPlanModel);
+
+
+            }
+        } finally {
+            fab.setVisibility(View.VISIBLE);
         }
 
         c.close();
@@ -97,7 +110,7 @@ public class DayPlan extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                assasingh.nearmev2.Model.DayPlan picked = (assasingh.nearmev2.Model.DayPlan) parent.getItemAtPosition(position);
+                DayPlanModel picked = (DayPlanModel) parent.getItemAtPosition(position);
 
                 final android.app.FragmentManager fm = getFragmentManager();
                 final FavouriteAlertFragment favFrag = new FavouriteAlertFragment();
@@ -109,7 +122,7 @@ public class DayPlan extends AppCompatActivity {
                 bundle.putInt("posInList", position);
                 bundle.putString("photoRef", picked.getPhotoRef());
                 bundle.putString("description", picked.getDescription());
-                bundle.putString("dayPlan", "dayPlan");
+                bundle.putString("dayPlanModel", "dayPlanModel");
                 favFrag.setArguments(bundle);
 
                 favFrag.show(fm,"Alert");

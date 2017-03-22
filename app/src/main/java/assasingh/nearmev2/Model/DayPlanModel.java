@@ -4,11 +4,13 @@ import android.widget.ImageView;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.Serializable;
+
 /**
  * Created by Assa Chana on 23/11/2016.
  */
 
-public class DayPlan {
+public class DayPlanModel implements Serializable {
 
     private String title;
     private String description;
@@ -16,6 +18,15 @@ public class DayPlan {
     private String time;
     private long id;
     private LatLng latlng;
+    private String placeId;
+
+    public String getPlaceId() {
+        return placeId;
+    }
+
+    public void setPlaceId(String placeId) {
+        this.placeId = placeId;
+    }
 
     public void setLatlng(double lat, double lng) {
         LatLng ll = new LatLng(lat, lng);

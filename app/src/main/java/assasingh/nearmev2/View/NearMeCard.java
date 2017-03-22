@@ -49,6 +49,7 @@ public class NearMeCard extends AppCompatActivity {
     String photoRef;
     Double lat;
     Double lng;
+    String address;
 
     ProgressBar progressBar;
 
@@ -90,6 +91,7 @@ public class NearMeCard extends AppCompatActivity {
         photoRef = NearMe.places.get(id).getPhotoRef();
         lat = NearMe.places.get(id).getLatitude();
         lng = NearMe.places.get(id).getLongitude();
+        address = NearMe.places.get(id).getAddress();
 
 
 
@@ -100,7 +102,7 @@ public class NearMeCard extends AppCompatActivity {
         else
             openNow.setText(sDescription);
 
-        description.setText(sRating + " stars (this is meant to be the description)");
+        description.setText(sRating + " stars \n\n" + address);
 
         name.setText(sName);
         String cursorString = sTypes;

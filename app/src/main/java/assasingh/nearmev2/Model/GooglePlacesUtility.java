@@ -190,14 +190,17 @@ public class GooglePlacesUtility {
 
                 String extraInfoUrl = "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + placeID + "&key=AIzaSyB3Qirj2H1pL_63c7yXcMIMCjcQUinyHS4";
 
-                String res = urlRequest(extraInfoUrl);
+                String res = urlRequest(extraInfoUrl); //TODO
+
+                String phone = "";
+                String address = "";
+
                 JSONObject jObject = new JSONObject(res);
 
                 JSONObject obj = jObject.getJSONObject("result");
 
-                String address = obj.getString("formatted_address");
+                address = obj.getString("formatted_address");
 
-                String phone = "";
 
                 if (obj.has("formatted_phone_number")) {
                     phone = obj.getString("formatted_phone_number");
@@ -232,6 +235,38 @@ public class GooglePlacesUtility {
 
             return result;
         }
+    }
+
+    public List<DirectionModel> getPolyLine(String url) throws Exception {
+        String jsonData = urlRequest(url);
+
+        DirectionModel directionModel = new DirectionModel();
+
+        ArrayList<DirectionModel> result = new ArrayList<DirectionModel>();
+
+
+        JSONObject jsonObject = new JSONObject(jsonData);
+        JSONArray jsonArray = jsonObject.getJSONArray("routes");
+        JSONObject route = jsonArray.getJSONObject(0);
+        JSONObject polyLineObj = route.getJSONObject("overview_polyline");
+
+        String polyLine = polyLineObj.getString("points");
+        String startAddress = route.getJSONArray("legs").getJSONObject(0).getString("start_address");
+        String endAddress = route.getJSONArray("legs").getJSONObject(0).getString("end_address");
+        String distance = route.getJSONArray("legs").getJSONObject(0).getJSONObject("distance").getString("text");
+        String duration = route.getJSONArray("legs").getJSONObject(0).getJSONObject("duration").getString("text");
+
+        directionModel.setDistance(distance);
+        directionModel.setDuration(duration);
+        directionModel.setPolyLine(polyLine);
+        directionModel.setStartAddress(startAddress);
+        directionModel.setEndAddress(endAddress);
+
+        result.add(directionModel);
+
+
+        return result;
+
     }
 
     private String urlRequest(String s) throws Exception {

@@ -14,14 +14,14 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 
-import assasingh.nearmev2.Model.DayPlan;
+import assasingh.nearmev2.Model.DayPlanModel;
 import assasingh.nearmev2.R;
 
 public class DayPlanListAdapter extends BaseAdapter {
-    private ArrayList<DayPlan> listData;
+    private ArrayList<DayPlanModel> listData;
     private LayoutInflater layoutInflater;
 
-    public DayPlanListAdapter(Context aContext, ArrayList<DayPlan> listData) {
+    public DayPlanListAdapter(Context aContext, ArrayList<DayPlanModel> listData) {
         this.listData = listData;
         layoutInflater = LayoutInflater.from(aContext);
     }
