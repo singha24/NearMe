@@ -210,8 +210,8 @@ public class MainActivity extends AppCompatActivity
         dev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Intent i = new Intent(getApplicationContext(), Test.class);
-                //startActivity(i);
+                Intent i = new Intent(getApplicationContext(), Test.class);
+                startActivity(i);
             }
         });
 

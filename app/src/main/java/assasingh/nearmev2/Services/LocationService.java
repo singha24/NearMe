@@ -238,7 +238,7 @@ public class LocationService extends Service implements android.location.Locatio
                     if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                         return;
                     }
-                    mLocationManager.removeUpdates((android.location.LocationListener) mLocationListeners[i]);
+                    //mLocationManager.removeUpdates((android.location.LocationListener) mLocationListeners[i]);
                 } catch (Exception ex) {
                     Log.i(TAG, "fail to remove location listener, ignore", ex);
                 }

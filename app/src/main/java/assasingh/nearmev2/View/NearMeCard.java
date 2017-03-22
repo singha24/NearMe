@@ -1,13 +1,18 @@
 package assasingh.nearmev2.View;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -73,7 +78,7 @@ public class NearMeCard extends AppCompatActivity {
         openNow = (TextView) findViewById(R.id.open_now);
         description = (TextView) findViewById(R.id.description);
         types = (TextView) findViewById(R.id.types);
-        call = (ImageView) findViewById(R.id.call);
+        call = (ImageView) findViewById(R.id.callPlace);
         share = (ImageView) findViewById(R.id.sharePlace);
         website = (ImageView) findViewById(R.id.website);
         name = (TextView) findViewById(R.id.name);
@@ -94,6 +99,8 @@ public class NearMeCard extends AppCompatActivity {
         lat = NearMe.places.get(id).getLatitude();
         lng = NearMe.places.get(id).getLongitude();
         address = NearMe.places.get(id).getAddress();
+        sCall = NearMe.places.get(id).getPhone();
+        sWebsite = NearMe.places.get(id).getWebsite();
 
 
         boolean s = Boolean.valueOf(sOpenNow);
@@ -185,8 +192,61 @@ public class NearMeCard extends AppCompatActivity {
             }
         });
 
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                share(lat, lng, sName);
+            }
+        });
+
+
+        website.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(sWebsite));
+                startActivity(i);
+            }
+        });
+
+        call.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!sCall.equals("000000")) {
+                    call(sCall);
+                } else {
+                    Snackbar.make(view, "They don't seem to have a phone number I'm afraid.", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+            }
+        });
+
 
     }
+
+    void call(String number) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        Intent callIntent = new Intent(Intent.ACTION_CALL);
+        callIntent.setData(Uri.parse("tel:" + number));
+
+        startActivity(callIntent);
+    }
+
+    public void share(double latitude, double longitude, String name) {
+
+        String uri = "http://maps.google.com/maps?saddr=" + latitude + "," + longitude;
+
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
+        String ShareSub = "Recommendation";
+        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, ShareSub);
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, uri + "\n\n" + "It's a cool place called " + name + ", thought you might want to check it out!");
+        startActivity(Intent.createChooser(sharingIntent, "Share via"));
+
+    }
+
 
     public static String getDate() {
         try {

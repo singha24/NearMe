@@ -192,7 +192,7 @@ public class GooglePlacesUtility {
 
                 String res = urlRequest(extraInfoUrl); //TODO
 
-                String phone = "";
+                String phone = "000000";
                 String address = "";
 
                 JSONObject jObject = new JSONObject(res);
@@ -216,6 +216,12 @@ public class GooglePlacesUtility {
                     }
                 }
 
+                String website = "https://en.wikipedia.org/wiki/HTTP_404";
+
+                if (obj.has("website")) {
+                    website = obj.getString("website");
+                }
+
 
                 place.setLatitude(lat);
                 place.setLongitude(lng);
@@ -228,6 +234,7 @@ public class GooglePlacesUtility {
                 place.setTypes(types);
                 place.setAddress(address);
                 place.setPhone(phone);
+                place.setWebsite(website);
 
                 result.add(place);
             }

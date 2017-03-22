@@ -101,6 +101,15 @@ public class NearMe extends AppCompatActivity {
         Bundle b = getIntent().getExtras();
         latitude = b.getDouble("lat");
         longitude = b.getDouble("lon");
+
+        if (latitude == 0.0) {
+            latitude = 52.487144;
+        }
+
+        if (longitude == 0.0) {
+            longitude = -1.886977;
+        }
+
         if (b.getString("query") != null) {
             query = b.getString("query");
             query = query.replace("something", "");
@@ -117,8 +126,8 @@ public class NearMe extends AppCompatActivity {
 
         int prefRadius = Integer.valueOf(sharedPrefs.getString("walk_max", "-1"));
 
-        //radius = prefRadius; //TODO Change back
-        radius = 50;
+        radius = prefRadius; //TODO Change back
+
 
         int minPrice = Integer.valueOf(sharedPrefs.getString("cost_max", "-1"));
         int maxPrice = Integer.valueOf(sharedPrefs.getString("cost_max", "-1"));
@@ -167,7 +176,7 @@ public class NearMe extends AppCompatActivity {
 
         Log.d("URL_REQ", placesRequest);
 
-        setTitle(activity + " : " + convertRadiusToMiles(radius) + latitude + ": " + longitude);
+        setTitle("NearMe Places");
 
         /*SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         if (!prefs.getBoolean("firstTime", false)) {

@@ -51,7 +51,7 @@
             android:key="cost_max"
             android:title="I am willing to spend"
             android:summary="Here you can define how much you are willing to spend."
-            android:defaultValue="500"
+            android:defaultValue="0"
             android:entries="@array/costHuman"
             android:entryValues="@array/costValues" />
 

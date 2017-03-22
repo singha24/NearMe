@@ -21,6 +21,16 @@ public class SimpleGooglePlace implements ClusterItem {
     String phone;
     String address;
 
+    String website;
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
     String error;
 
     public String getError() {
