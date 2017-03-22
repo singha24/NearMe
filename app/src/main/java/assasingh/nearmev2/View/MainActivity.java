@@ -19,6 +19,7 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.speech.RecognizerIntent;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewPager;
@@ -38,13 +39,17 @@ import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Set;
 
@@ -83,6 +88,10 @@ public class MainActivity extends AppCompatActivity
 
     public static volatile String ERROR = "";
 
+    private Button heartAston;
+    private Button moreAston;
+    private Button dayPlanAston;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +108,10 @@ public class MainActivity extends AppCompatActivity
         viewPager = (ViewPager) findViewById(R.id.trending);
 
         db = new DatabaseHelper(this);
+
+        heartAston = (Button) findViewById(R.id.heartAston);
+        moreAston = (Button) findViewById(R.id.moreInfo);
+        dayPlanAston = (Button) findViewById(R.id.dayPlan);
 
 
         TrendingAdapter trendingAdapter = new TrendingAdapter (getSupportFragmentManager());
@@ -197,12 +210,70 @@ public class MainActivity extends AppCompatActivity
         dev.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent i = new Intent(getApplicationContext(), Test.class);
-                startActivity(i);
+                //Intent i = new Intent(getApplicationContext(), Test.class);
+                //startActivity(i);
+            }
+        });
+
+        heartAston.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int success = db.insertPlaceToFavs(52.487144, -1.886977, "Aston University",
+                        "CoQBdwAAAFesHv7zCSHBlhwueowpFZbi9RyOTwi3T7IBtLwFnlloR612zghe7DRizdJ3L-YWq" +
+                                "WyL4p4M_mKkrTavs8RXXZSU1fYqxSrCkJ1RBoXoxIaQEIsQDT8wExL7pJjyxUqutl7dECU6Yu" +
+                                "upKX4SitqIWA3S1JQ5JXsFh8Bx35DL52yjEhA03e4TpEr_70wgZFigFEhiGhTawbItMngEaRMGWyIsWBnvvzUSUw", 4.0,
+                        "true", "Aston University is one of the best known and the most successful scientific research institutions in the UK, located at Aston Triangle, Birmingham, West Midlands.", "Education", getDate(), 0); //0 for place visited
+
+                if (success == 0) {
+                    Snackbar.make(view, "Aston University has been added to your loved places", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                } else {
+                    Snackbar.make(view, "Unable to love this place :(", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+            }
+        });
+
+        moreAston.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Currently not configured", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+
+        dayPlanAston.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int success = db.insertIntoDayPlan(52.487144, -1.886977, "Aston University",
+                        "CoQBdwAAAFesHv7zCSHBlhwueowpFZbi9RyOTwi3T7IBtLwFnlloR612zghe7DRizdJ3L-YWq" +
+                                "WyL4p4M_mKkrTavs8RXXZSU1fYqxSrCkJ1RBoXoxIaQEIsQDT8wExL7pJjyxUqutl7dECU6Yu" +
+                                "upKX4SitqIWA3S1JQ5JXsFh8Bx35DL52yjEhA03e4TpEr_70wgZFigFEhiGhTawbItMngEaRMGWyIsWBnvvzUSUw", "Aston University is one of the best known and the most successful scientific research institutions in the UK, located at Aston Triangle, Birmingham, West Midlands.");
+                if (success == 0) {
+                    Snackbar.make(view, "Aston University has been added to Day Plan", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                } else {
+                    Snackbar.make(view, "Unable to do that boss :(", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
             }
         });
 
 
+    }
+
+    public static String getDate() {
+        try {
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String currentDateTime = dateFormat.format(new Date()); // Find todays date
+
+            return currentDateTime;
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return null;
+        }
     }
 
     public void vibrate(){

@@ -77,7 +77,7 @@ public class DayPlanMap extends AppCompatActivity {
         final LatLng destinationLatLng = dayPlan.get(dayPlan.size() - 1).getLatlng();
 
         desting = destinationLatLng.latitude + "," + destinationLatLng.longitude;
-        sUserPos = "52.487144,-1.886977";
+        sUserPos = userPos.latitude + "," + userPos.longitude;
 
         mapView = (MapView) findViewById(R.id.dayPlanMap);
         mapView.onCreate(savedInstanceState);
@@ -193,7 +193,7 @@ public class DayPlanMap extends AppCompatActivity {
 
             startAddress.setText("Starting @: " + result.get(0).getStartAddress());
             endAddress.setText("Finishing @: " + result.get(0).getEndAddress());
-            duration.setText("This route will take :" + result.get(0).getDuration());
+            duration.setText("This route will take :" + result.get(0).getDuration() + " because you are " + travelMode);
             distance.setText("You'll cover: " + result.get(0).getDistance());
 
             decodedPath = PolyUtil.decode(result.get(0).getPolyLine());

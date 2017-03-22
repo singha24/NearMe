@@ -14,13 +14,36 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
         <android.support.v4.view.ViewPager
             android:layout_width="match_parent"
             android:layout_height="207dp"
             android:background="@drawable/border"
             android:id="@+id/trending" />
+
+        <Button
+            android:id="@+id/heartAston"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/heart"
+            android:backgroundTint="#FF0000" />
+
+        <Button
+            android:id="@+id/moreInfo"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/ic_more_black_24dp" />
+
+        <Button
+            android:id="@+id/dayPlan"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/list"
+            android:backgroundTint="#dddddd" />
 
 
     </LinearLayout>
@@ -52,7 +75,6 @@
         </ListView>
 
     </LinearLayout>
-
 
 
 </LinearLayout>

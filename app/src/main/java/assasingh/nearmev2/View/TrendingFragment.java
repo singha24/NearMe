@@ -61,6 +61,9 @@ public class TrendingFragment extends Fragment {
 
         ls = new LocationService();
 
+        image.setImageResource(R.drawable.astonhome);
+        count.setText("Trending now!");
+
         //gi.execute(URL);
 
 

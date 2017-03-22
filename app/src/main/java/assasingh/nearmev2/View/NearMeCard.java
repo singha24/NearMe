@@ -146,7 +146,6 @@ public class NearMeCard extends AppCompatActivity {
                     Snackbar.make(view, sName + " has been added to your loved places", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                     love.setBackgroundResource(R.drawable.heartred);
-                    clicked = true;
                 } else {
                     Snackbar.make(view, "Unable to love this place :(", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
@@ -176,7 +175,13 @@ public class NearMeCard extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 int success = db.insertIntoDayPlan(lat, lng, sName, photoRef, sDescription);
-                Toast.makeText(getApplication(), String.valueOf(success), Toast.LENGTH_LONG).show();
+                if (success == 0) {
+                    Snackbar.make(view, sName + " has been added to Day Plan", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                } else {
+                    Snackbar.make(view, "Unable to do that boss :(", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
             }
         });
 
