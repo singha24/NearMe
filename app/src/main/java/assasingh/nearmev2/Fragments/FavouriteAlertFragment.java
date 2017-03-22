@@ -4,6 +4,7 @@ package assasingh.nearmev2.Fragments;
 import android.app.DialogFragment;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,8 +27,8 @@ import assasingh.nearmev2.View.PostCard;
 public class FavouriteAlertFragment extends DialogFragment {
 
     private static ListView lv;
-    private static Integer[] actionIcons = {R.drawable.postcard, R.drawable.share, R.drawable.cross};
-    private static String[] menu = {"Create Postcard", "Share this place", "Remove from list"};
+    private static Integer[] actionIcons = {R.drawable.postcard, R.drawable.share, R.drawable.visited, R.drawable.cross};
+    private static String[] menu = {"Create Postcard", "Share this place", "Mark Visited", "Remove from list"};
     private static long placeID;
     private String name;
     private LatLng pos;
@@ -89,9 +90,22 @@ public class FavouriteAlertFragment extends DialogFragment {
                         break;
                     case 2:
 
+                        int res = markVisited(name, 1);
+
+                        if (res == 0) {
+                            Snackbar.make(view, name + " has been marked as visited", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+                        }
+
+                        break;
+                    case 3:
+
                         boolean success = deleteFromTable(placeID, getTable());
 
-                        Toast.makeText(getActivity(), placeID + " : " + String.valueOf(success), Toast.LENGTH_SHORT).show();
+                        if (success) {
+                            Snackbar.make(view, name + " has been removed from this list", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+                        }
 
                         break;
                 }
@@ -117,6 +131,11 @@ public class FavouriteAlertFragment extends DialogFragment {
         } else {
             return getDayPlanTable();
         }
+    }
+
+    public int markVisited(String name, int val) {
+        DatabaseHelper db = new DatabaseHelper(getActivity());
+        return db.updatePlaceVisited(name, val);
     }
 
     public boolean deleteFromTable(long id, String tableName) {

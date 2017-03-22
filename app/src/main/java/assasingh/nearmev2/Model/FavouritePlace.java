@@ -17,7 +17,15 @@ public class FavouritePlace {
     private String rating;
     private long id;
     private LatLng pos;
+    private String visited;
 
+    public String getVisited() {
+        return visited;
+    }
+
+    public void setVisited(String visited) {
+        this.visited = visited;
+    }
 
     public LatLng getLatLng(){
         return pos;

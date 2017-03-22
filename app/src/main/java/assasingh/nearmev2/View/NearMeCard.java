@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -27,7 +28,7 @@ public class NearMeCard extends AppCompatActivity {
 
     private ImageView placeImage;
     private Button love;
-    ImageView beenHereBefore;
+    Button beenHereBefore;
 
     TextView openNow;
     TextView description;
@@ -50,6 +51,7 @@ public class NearMeCard extends AppCompatActivity {
     Double lat;
     Double lng;
     String address;
+    boolean clicked;
 
     ProgressBar progressBar;
 
@@ -65,7 +67,7 @@ public class NearMeCard extends AppCompatActivity {
 
         id = (int) getIntent().getLongExtra("id", 0);
 
-         db = new DatabaseHelper(this);
+        db = new DatabaseHelper(this);
 
 
         openNow = (TextView) findViewById(R.id.open_now);
@@ -75,10 +77,10 @@ public class NearMeCard extends AppCompatActivity {
         share = (ImageView) findViewById(R.id.sharePlace);
         website = (ImageView) findViewById(R.id.website);
         name = (TextView) findViewById(R.id.name);
-        love = (Button) findViewById(R.id.heart);
+        love = (Button) findViewById(R.id.heartLove);
         placeImage = (ImageView) findViewById(R.id.near_me_card_image);
         progressBar = (ProgressBar) findViewById(R.id.progress);
-        beenHereBefore = (ImageView) findViewById(R.id.done);
+        beenHereBefore = (Button) findViewById(R.id.done);
         addToDayPlan = (Button) findViewById(R.id.dayPlan);
 
         addToDayPlan.setBackgroundColor(Color.parseColor("#b2bcbc"));
@@ -92,7 +94,6 @@ public class NearMeCard extends AppCompatActivity {
         lat = NearMe.places.get(id).getLatitude();
         lng = NearMe.places.get(id).getLongitude();
         address = NearMe.places.get(id).getAddress();
-
 
 
         boolean s = Boolean.valueOf(sOpenNow);
@@ -114,7 +115,6 @@ public class NearMeCard extends AppCompatActivity {
 
         outputText = outputText.replace("point_of_interest", "POI");
         outputText = outputText.trim();
-
 
 
         types.setText("\n" + outputText);
@@ -139,10 +139,36 @@ public class NearMeCard extends AppCompatActivity {
                 1 = error with insertion
                 2 = duplicate value
                  */
-                int success = db.insertPlaceToFavs(lat,lng, sName, photoRef, sRating,
-                        sOpenNow,sDescription, sTypes, getDate());
+                int success = db.insertPlaceToFavs(lat, lng, sName, photoRef, sRating,
+                        sOpenNow, sDescription, sTypes, getDate(), 0); //0 for place visited
 
-                Toast.makeText(getApplication(), String.valueOf(success), Toast.LENGTH_LONG).show();
+                if (success == 0) {
+                    Snackbar.make(view, sName + " has been added to your loved places", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                    love.setBackgroundResource(R.drawable.heartred);
+                    clicked = true;
+                } else {
+                    Snackbar.make(view, "Unable to love this place :(", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+            }
+        });
+
+        beenHereBefore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                int result = db.updatePlaceVisited(sName, 1);
+                if (result == 0) {
+                    beenHereBefore.setBackgroundResource(R.drawable.tick);
+                    Snackbar.make(view, sName + " has been added to your visited places", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                    clicked = true;
+                } else {
+                    Snackbar.make(view, "Unable to set this place as visited :(", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                }
+
             }
         });
 
@@ -150,14 +176,14 @@ public class NearMeCard extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 int success = db.insertIntoDayPlan(lat, lng, sName, photoRef, sDescription);
-                Toast.makeText(getApplication(), String.valueOf(success),Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplication(), String.valueOf(success), Toast.LENGTH_LONG).show();
             }
         });
 
 
     }
 
-    public static String getDate(){
+    public static String getDate() {
         try {
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

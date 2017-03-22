@@ -34,6 +34,7 @@ public class FavouritePlaces extends AppCompatActivity {
     long id;
     double lat;
     double lng;
+    String visited;
 
     public static FavouriteListAdapter adap;
 
@@ -68,6 +69,7 @@ public class FavouritePlaces extends AppCompatActivity {
 
             lat = c.getDouble(c.getColumnIndexOrThrow("lat"));
             lng = c.getDouble(c.getColumnIndexOrThrow("lng"));
+            visited = c.getString(c.getColumnIndexOrThrow("visited"));
 
 
 
@@ -79,6 +81,7 @@ public class FavouritePlaces extends AppCompatActivity {
             favPlace.setId(id);
             favPlace.setLatLng(lat,lng);
             favPlace.setPhotoRef(photoRef);
+            favPlace.setVisited(visited);
 
 
             favs.add(favPlace);

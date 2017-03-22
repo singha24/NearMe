@@ -32,6 +32,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String WEEKDAY_TEXT = "weekday_text";
     private static final String TYPE = "type";
     private static final String DATE = "date";
+    private static final String VISITED = "visited";
 
     private static int VERSION = 1;
 
@@ -48,7 +49,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("create table " + FAV_PLACES_TABLE + " ( " + PLACES_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + LAT + "," + LNG + ", " + NAME + ", " + PHOTO_REF + "," + RATING + ", " +
-                OPEN_NOW + ", " + WEEKDAY_TEXT + "," + TYPE + "," + DATE + ")");
+                OPEN_NOW + ", " + WEEKDAY_TEXT + "," + TYPE + "," + DATE + "," + VISITED + ")");
         db.execSQL("create table " + LAT_LNG_TABLE + "( " + LATLNG_ID + "," + LATLNG_LAT + "," + LATLNG_LNG + ")");
         db.execSQL("create table " + DAY_PLAN_TABLE + "(" + PLACES_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + NAME + ", " + LAT + ", " + LNG + ", " + PHOTO_REF + ", description)");
 
@@ -61,6 +62,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("drop table if exists" + DAY_PLAN_TABLE);
         onCreate(db);
 
+    }
+
+    public int updatePlaceVisited(String name, int val) {
+
+        long result;
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+
+        cv.put(VISITED, 1);
+
+        result = db.update(FAV_PLACES_TABLE, cv, NAME + '=' + "'" + name + "'", null);
+
+        if (result == -1)
+            return 1;
+        else
+            return 0;
     }
 
     public int insertIntoDayPlan(Double lat, Double lng, String name, String photo_ref, String description) {
@@ -123,7 +140,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
-    public int insertPlaceToFavs(Double lat, Double lng, String name, String photo_ref, Double rating, String open, String weekdayText, String type, String date) {
+    public int insertPlaceToFavs(Double lat, Double lng, String name, String photo_ref, Double rating, String open, String weekdayText, String type, String date, int visited) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         long result;
@@ -138,6 +155,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(WEEKDAY_TEXT, weekdayText);
         cv.put(TYPE, type);
         cv.put(DATE, date);
+        cv.put(VISITED, visited);
 
         result = db.insert(FAV_PLACES_TABLE, null, cv);
 

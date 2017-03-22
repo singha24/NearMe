@@ -50,20 +50,19 @@
                             android:layout_height="220dp"
                             android:scaleType="fitXY" />
 
-                        <ImageView
+                        <Button
                             android:id="@+id/done"
                             android:layout_width="60dp"
                             android:layout_height="60dp"
                             android:layout_gravity="bottom|right"
                             android:paddingRight="10dp"
-                            android:src="@drawable/tick"
-                            android:tint="#000000" />
+                            android:background="@drawable/notvisited" />
 
                         <Button
-                            android:id="@+id/heart"
+                            android:id="@+id/heartLove"
                             android:layout_marginBottom="-35dp"
                             android:layout_gravity="bottom|center_horizontal"
-                            android:background="@drawable/heart"
+                            android:background="@drawable/heartblack"
                             android:layout_width="80dp"
                             android:layout_height="80dp" />
 

@@ -53,9 +53,17 @@ public class FavouriteListAdapter extends BaseAdapter {
             holder.title = (TextView) convertView.findViewById(R.id.title);
             holder.image = (ImageView) convertView.findViewById(R.id.favPlaceImage);
             holder.date = (TextView) convertView.findViewById(R.id.date);
+            holder.visited = (TextView) convertView.findViewById(R.id.visited);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
+        }
+
+        if (listData.get(position).getVisited().equals("1")) {
+
+            holder.visited.setText("You have marked this place as visited.");
+        } else {
+            holder.visited.setVisibility(convertView.GONE);
         }
 
         holder.title.setText(listData.get(position).getTitle());
@@ -70,6 +78,7 @@ public class FavouriteListAdapter extends BaseAdapter {
         TextView date;
         View view;
         String photoRef;
+        TextView visited;
 
         public ViewHolder(View view, String photoRef) {
             this.view = view;

@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -48,11 +49,17 @@ public class DayPlan extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Lets Go!!!", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                if (getDayPlanSize() > 0) {
+                    Snackbar.make(view, "Lets Go!!!", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
 
-                Intent intent = new Intent(getApplicationContext(), DayPlanMap.class);
-                startActivity(intent);
+                    Intent intent = new Intent(getApplicationContext(), DayPlanMap.class);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Try adding something to this list first!!", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(intent);
+                }
 
 
             }
@@ -131,6 +138,10 @@ public class DayPlan extends AppCompatActivity {
             }
         });
 
+    }
+
+    public int getDayPlanSize() {
+        return dayPlan.size();
     }
 
 }
