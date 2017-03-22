@@ -68,7 +68,7 @@ import android.view.MotionEvent;
 import static android.view.GestureDetector.*;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnGestureListener, OnDoubleTapListener {
+        implements OnGestureListener, OnDoubleTapListener {
 
     private static String [] menu = {"Your Day Plan", "Near Me", "Favourite Places", "My Preferences"};
     private static Integer[] menuImages = {R.drawable.list, R.drawable.location, R.drawable.heart, R.drawable.more};
@@ -152,9 +152,6 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
 
         gestureDetectorCompat = new GestureDetectorCompat(MainActivity.this, MainActivity.this);
         gestureDetectorCompat.setOnDoubleTapListener(MainActivity.this);
@@ -506,41 +503,7 @@ public class MainActivity extends AppCompatActivity
 
         return super.onOptionsItemSelected(item);
     }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        FragmentManager manager = getSupportFragmentManager();
-
-
-        if (id == R.id.nav_first_layout) {
-            FirstFragment firstFragment = new FirstFragment();
-
-            manager.beginTransaction().replace(R.id.content_main, firstFragment, firstFragment.getTag()).commit();
-
-        } else if (id == R.id.nav_second_layout) {
-
-            SecondFragment secondFragment = new SecondFragment();
-            manager.beginTransaction().replace(R.id.content_main, secondFragment, secondFragment.getTag()).commit();
-
-        } else if (id == R.id.nav_third_layout) {
-
-            ThirdFragment thirdFragment = new ThirdFragment();
-            manager.beginTransaction().replace(R.id.content_main, thirdFragment, thirdFragment.getTag()).commit();
-
-        }  else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
+    
 
     @Override
     protected void onStart() {

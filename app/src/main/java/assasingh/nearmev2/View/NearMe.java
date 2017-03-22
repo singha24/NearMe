@@ -126,7 +126,8 @@ public class NearMe extends AppCompatActivity {
 
         int prefRadius = Integer.valueOf(sharedPrefs.getString("walk_max", "-1"));
 
-        radius = prefRadius; //TODO Change back
+        //radius = prefRadius; //TODO Change back
+        radius = 100;
 
 
         int minPrice = Integer.valueOf(sharedPrefs.getString("cost_max", "-1"));
